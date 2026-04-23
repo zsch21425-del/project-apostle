@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project Apostle: The Way of the Cross</title>
+<style>
+/* ─── RESET & BASE ─── */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Georgia',serif;color:#eee}
+button{cursor:pointer;font-family:inherit}
+
+/* ─── BACKGROUND LAYER ─── */
+#bg{
+  position:fixed;inset:0;z-index:0;
+  background-size:cover;background-position:center;
+  transition:background-image 1.8s ease, filter 2s ease;
+  animation:kb 24s ease-in-out infinite alternate;
+}
+@keyframes kb{0%{transform:scale(1.0)translate(0,0)}50%{transform:scale(1.12)translate(-1.2%,-.5%)}100%{transform:scale(1.18)translate(1%,.5%)}   }
+
+/* mood overlays */
+#bg.great    {filter:saturate(1.12)brightness(1.05)}
+#bg.troubled {filter:saturate(0.28)brightness(0.88)}
+#bg.satan    {filter:saturate(0.8)brightness(0.7) hue-rotate(10deg)}
+
+/* ─── LIGHT RAYS ─── */
+#rays{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.ray{position:absolute;top:-10%;left:20%;width:40%;height:130%;
+     opacity:0;animation:ray_s 9s ease-in-out infinite;transform-origin:top left}
+.ray:nth-child(2){left:45%;width:28%;animation-delay:4.5s}
+@keyframes ray_s{0%,100%{opacity:0}35%,65%{opacity:1}}
+#rays.great .ray{background:linear-gradient(155deg,rgba(255,240,160,.18) 0%,transparent 60%)}
+#rays.troubled .ray{background:linear-gradient(155deg,rgba(140,145,160,.08) 0%,transparent 50%)}
+#rays.satan .ray{background:linear-gradient(155deg,rgba(200,40,10,.14) 0%,transparent 55%)}
+
+/* ─── PARTICLE CANVAS ─── */
+#particles{position:fixed;inset:0;z-index:2;pointer-events:none}
+
+/* ─── VIGNETTE ─── */
+#vig{position:fixed;inset:0;z-index:3;pointer-events:none;
+     background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.72) 100%)}
+
+/* ─── SATAN OVERLAYS ─── */
+#satan-pulse{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center bottom,rgba(180,20,5,.4) 0%,transparent 70%);
+  animation:sp 3s ease-in-out infinite alternate}
+@keyframes sp{0%{opacity:0}100%{opacity:1}}
+#scan{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
+#lightning{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;
+  background:rgba(255,60,10,.12);animation:lf 7s infinite}
+@keyframes lf{0%,83%,88%,100%{opacity:0}85.5%{opacity:1}87%{opacity:.3}}
+
+/* ─── HUD ─── */
+#hud{position:fixed;top:0;left:0;right:0;z-index:20;padding:14px 22px;
+     display:flex;align-items:center;justify-content:space-between;
+     background:linear-gradient(to bottom,rgba(0,0,0,.55),transparent)}
+.hud-left{display:flex;align-items:center;gap:14px}
+#char-badge{font-size:11px;letter-spacing:2px;text-transform:uppercase;
+            padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);color:#ddd}
+.spirit-wrap{display:flex;align-items:center;gap:10px}
+#spirit-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#aaa}
+#spirit-track{width:180px;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+#spirit-fill{height:100%;border-radius:3px;transition:width 1s,background .8s,box-shadow .8s}
+#spirit-num{font-size:13px;font-weight:bold;min-width:40px;transition:color .8s}
+.hud-right{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888}
+#location-label{color:#ccc;font-size:11px;letter-spacing:3px}
+
+/* ─── SCREENS ─── */
+.screen{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
+.screen.hidden{display:none}
+
+/* ─── TITLE SCREEN ─── */
+#title-screen{background:radial-gradient(ellipse at center,rgba(10,8,5,.6) 0%,rgba(0,0,0,.92) 100%)}
+.game-title{font-size:clamp(28px,5vw,54px);letter-spacing:8px;text-transform:uppercase;
+            color:#e8d080;font-weight:300;text-shadow:0 0 40px rgba(255,220,80,.4);margin-bottom:6px}
+.game-sub{font-size:clamp(11px,1.5vw,14px);letter-spacing:5px;text-transform:uppercase;
+          color:rgba(255,255,255,.45);margin-bottom:50px}
+.divider{width:80px;height:1px;background:rgba(255,220,80,.35);margin:0 auto 40px}
+
+/* ─── CHARACTER SELECT ─── */
+#char-screen .screen-title{font-size:13px;letter-spacing:5px;text-transform:uppercase;
+  color:#888;margin-bottom:30px}
+.char-grid{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:800px}
+.char-card{width:170px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+           border-radius:10px;padding:20px 16px;text-align:center;cursor:pointer;
+           transition:transform .25s,border-color .25s,background .25s}
+.char-card:hover,.char-card.selected{border-color:rgba(255,220,80,.5);background:rgba(255,220,80,.08);transform:translateY(-4px)}
+.char-icon{font-size:38px;margin-bottom:10px}
+.char-name{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:#ddd;margin-bottom:8px}
+.char-title{font-size:10px;color:#888;letter-spacing:1px;margin-bottom:12px}
+.char-perk{font-size:10px;color:#aaa;line-height:1.5}
+.char-perk strong{color:#e8d080}
+
+/* ─── STORY MISSION / NARRATIVE SCREEN ─── */
+#mission-screen{padding:20px}
+.mission-wrap{max-width:680px;width:100%;text-align:center}
+.mission-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#888;
+               border:1px solid rgba(255,255,255,.15);padding:4px 14px;border-radius:10px;margin-bottom:18px;display:inline-block}
+.mission-title{font-size:clamp(20px,3vw,32px);letter-spacing:4px;text-transform:uppercase;
+               color:#e8d080;font-weight:300;margin-bottom:22px}
+.mission-text{font-size:14px;line-height:1.9;color:rgba(255,255,255,.8);margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto}
+.mission-choices{display:flex;flex-direction:column;gap:12px;align-items:center}
+.choice-btn{width:100%;max-width:520px;padding:14px 24px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;color:#ddd;font-size:13px;letter-spacing:1px;text-align:left;
+  transition:background .2s,border-color .2s,transform .15s;display:flex;gap:14px;align-items:flex-start}
+.choice-btn:hover{background:rgba(255,255,255,.12);transform:translateX(4px)}
+.choice-btn.righteous{border-color:rgba(100,220,130,.3)}
+.choice-btn.righteous:hover{border-color:rgba(100,220,130,.7);background:rgba(100,220,130,.08)}
+.choice-btn.neutral{border-color:rgba(200,200,100,.2)}
+.choice-btn.neutral:hover{border-color:rgba(200,200,100,.6);background:rgba(200,200,100,.06)}
+.choice-btn.sinful{border-color:rgba(220,80,60,.3)}
+.choice-btn.sinful:hover{border-color:rgba(220,80,60,.7);background:rgba(220,80,60,.08)}
+.choice-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;
+            padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.choice-tag.r{background:rgba(100,220,130,.2);color:#88ee99}
+.choice-tag.n{background:rgba(200,200,100,.15);color:#ddcc66}
+.choice-tag.s{background:rgba(220,80,60,.2);color:#ff8866}
+.choice-text{font-size:13px;line-height:1.5}
+.choice-cost{font-size:10px;opacity:.6;margin-top:3px}
+
+/* ─── CONSEQUENCE BANNER ─── */
+#consequence{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  z-index:50;text-align:center;pointer-events:none;opacity:0;
+  transition:opacity .4s,transform .4s}
+#consequence.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.consequence-inner{padding:28px 42px;border-radius:12px;
+  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.15);
+  backdrop-filter:blur(8px)}
+.consequence-icon{font-size:42px;margin-bottom:10px}
+.consequence-title{font-size:18px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.consequence-desc{font-size:12px;color:#aaa;letter-spacing:1px;max-width:320px}
+.spirit-change{font-size:22px;font-weight:bold;margin:12px 0 4px}
+
+/* ─── CAMPFIRE / SAVE ─── */
+#campfire-screen{background:radial-gradient(ellipse at center,rgba(30,15,5,.7) 0%,rgba(0,0,0,.9) 100%)}
+.campfire-icon{font-size:58px;margin-bottom:16px;animation:flicker_f .5s ease-in-out infinite alternate}
+@keyframes flicker_f{0%{transform:scale(1)}100%{transform:scale(1.04)rotate(1deg)}}
+.campfire-title{font-size:14px;letter-spacing:5px;text-transform:uppercase;color:#e8a840;margin-bottom:8px}
+.campfire-sub{font-size:11px;color:#666;letter-spacing:2px;margin-bottom:30px}
+.camp-stat{font-size:12px;color:#aaa;letter-spacing:1px;margin:4px 0}
+.camp-stat strong{color:#e8d080}
+
+/* ─── GAME OVER ─── */
+#gameover-screen{background:radial-gradient(ellipse at center,rgba(40,5,0,.8) 0%,rgba(0,0,0,.96) 100%)}
+.go-title{font-size:clamp(24px,4vw,46px);letter-spacing:6px;text-transform:uppercase;
+          color:#cc2200;margin-bottom:10px;animation:go_pulse 2s ease-in-out infinite alternate}
+@keyframes go_pulse{0%{text-shadow:0 0 20px rgba(200,30,0,.4)}100%{text-shadow:0 0 60px rgba(255,50,10,.8)}}
+.go-sub{font-size:12px;letter-spacing:3px;color:#553333;margin-bottom:14px}
+.go-text{font-size:13px;color:#884444;line-height:1.8;max-width:420px;text-align:center;margin-bottom:34px}
+
+/* ─── VICTORY ─── */
+#victory-screen{background:radial-gradient(ellipse at center,rgba(5,20,5,.7) 0%,rgba(0,0,0,.9) 100%)}
+.vic-title{font-size:clamp(22px,4vw,44px);letter-spacing:6px;text-transform:uppercase;
+           color:#88ee88;text-shadow:0 0 40px rgba(100,255,100,.3);margin-bottom:10px}
+
+/* ─── BUTTONS ─── */
+.btn{padding:12px 38px;border-radius:6px;border:1px solid rgba(255,255,255,.25);
+     background:rgba(255,255,255,.07);color:#ddd;font-size:12px;letter-spacing:3px;
+     text-transform:uppercase;transition:all .25s;margin:6px}
+.btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.5);color:#fff}
+.btn.gold{border-color:rgba(255,220,80,.5);color:#e8d080}
+.btn.gold:hover{background:rgba(255,220,80,.12)}
+.btn.red{border-color:rgba(220,80,60,.5);color:#ff8866}
+.btn.red:hover{background:rgba(220,80,60,.12)}
+
+/* ─── PROGRESS MAP ─── */
+#map-screen{padding:20px}
+.map-wrap{max-width:700px;width:100%;text-align:center}
+.map-title{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#888;margin-bottom:32px}
+.journey-path{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-bottom:36px}
+.map-node{text-align:center;padding:0 12px}
+.map-dot{width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,255,255,.2);
+         display:flex;align-items:center;justify-content:center;font-size:22px;
+         margin:0 auto 8px;transition:all .3s}
+.map-dot.done{border-color:#88dd88;background:rgba(100,220,100,.12)}
+.map-dot.current{border-color:#e8d080;background:rgba(255,220,80,.12);
+                 animation:map_pulse 2s ease-in-out infinite}
+.map-dot.locked{opacity:.3}
+@keyframes map_pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,220,80,.3)}50%{box-shadow:0 0 0 12px rgba(255,220,80,0)}}
+.map-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888}
+.map-name.current{color:#e8d080}
+.map-arrow{color:rgba(255,255,255,.2);font-size:20px;padding:0 4px;margin-top:-18px}
+.map-desc{font-size:13px;color:rgba(255,255,255,.7);line-height:1.8;max-width:500px;
+          margin:0 auto 32px}
+
+/* ─── REPENTANCE TASK ─── */
+#repent-screen{padding:20px}
+.repent-wrap{max-width:580px;width:100%;text-align:center}
+.repent-title{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#aaa;margin-bottom:14px}
+.repent-header{font-size:clamp(18px,3vw,28px);color:#e8d080;margin-bottom:20px;font-weight:300}
+.repent-task{font-size:14px;line-height:1.9;color:rgba(255,255,255,.8);margin-bottom:30px}
+.repent-cost{font-size:11px;color:#888;letter-spacing:1px;margin-bottom:22px}
+
+/* ─── FLASH ─── */
+#flash{position:fixed;inset:0;z-index:100;pointer-events:none;opacity:0}
+
+/* ─── SHAKE ─── */
+@keyframes shake_anim{0%,100%{transform:translate(0)}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(3px,-1px)}}
+.shake{animation:shake_anim .35s ease}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px){
+  .char-grid{gap:12px}
+  .char-card{width:140px;padding:14px 12px}
+  .journey-path{gap:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND & ATMOSPHERE -->
+<div id="bg" class="great" style=""></div>
+<div id="rays" class="great"><div class="ray"></div><div class="ray"></div></div>
+<canvas id="particles"></canvas>
+<div id="vig"></div>
+<div id="satan-pulse" style="display:none"></div>
+<div id="scan" style="display:none"></div>
+<div id="lightning" style="display:none"></div>
+<div id="flash"></div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="hud-left">
+    <div id="char-badge">–</div>
+    <div class="spirit-wrap">
+      <span id="spirit-label">Spirit</span>
+      <div id="spirit-track"><div id="spirit-fill" style="width:100%;background:#88ddaa"></div></div>
+      <span id="spirit-num" style="color:#88ddaa">100%</span>
+    </div>
+  </div>
+  <div class="hud-right">
+    <span id="location-label">The Way of the Cross</span>
+  </div>
+</div>
+
+<!-- CONSEQUENCE BANNER -->
+<div id="consequence">
+  <div class="consequence-inner">
+    <div class="consequence-icon" id="con-icon">⚡</div>
+    <div class="consequence-title" id="con-title">Sin Committed</div>
+    <div class="spirit-change" id="con-change">–12 Spirit</div>
+    <div class="consequence-desc" id="con-desc">Your spirit grows heavy.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREENS
+══════════════════════════════════════════ -->
+
+<!-- TITLE -->
+<div id="title-screen" class="screen">
+  <div class="game-title">Project Apostle</div>
+  <div class="game-sub">The Way of the Cross</div>
+  <div class="divider"></div>
+  <button class="btn gold" onclick="showScreen('char-screen')">Begin the Journey</button>
+  <button class="btn" onclick="loadGame()" style="margin-top:8px">Continue</button>
+  <div style="margin-top:40px;font-size:10px;letter-spacing:2px;color:#333;text-transform:uppercase">
+    First century Judea · An epic of faith
+  </div>
+</div>
+
+<!-- CHARACTER SELECT -->
+<div id="char-screen" class="screen hidden">
+  <div style="text-align:center;margin-bottom:8px">
+    <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#888">Choose Your Disciple</div>
+  </div>
+  <div class="char-grid" id="char-grid">
+    <!-- populated by JS -->
+  </div>
+  <div style="margin-top:24px">
+    <button class="btn gold" id="start-btn" onclick="startGame()" disabled style="opacity:.4">Begin →</button>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map-screen" class="screen hidden">
+  <div class="map-wrap">
+    <div class="map-title">Your Journey</div>
+    <div class="journey-path" id="journey-path"><!-- JS --></div>
+    <div class="map-desc" id="map-desc">Follow the path that leads to Jerusalem.</div>
+    <button class="btn gold" id="map-btn" onclick="enterLocation()">Enter →</button>
+  </div>
+</div>
+
+<!-- MISSION / RANDOM ACT -->
+<div id="mission-screen" class="screen hidden">
+  <div class="mission-wrap">
+    <div class="mission-badge" id="mission-badge">Random Act</div>
+    <div class="mission-title" id="mission-title">–</div>
+    <div class="mission-text" id="mission-text">–</div>
+    <div class="mission-choices" id="mission-choices"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- REPENTANCE TASK -->
+<div id="repent-screen" class="screen hidden">
+  <div class="repent-wrap">
+    <div class="repent-title">Sacrifice Task</div>
+    <div class="repent-header" id="repent-header">Seek Redemption</div>
+    <div class="repent-task" id="repent-task">–</div>
+    <div class="repent-cost" id="repent-cost">–</div>
+    <button class="btn gold" onclick="completeRepentance()">Complete the Task</button>
+    <button class="btn" onclick="skipRepentance()" style="margin-top:6px">Continue Without</button>
+  </div>
+</div>
+
+<!-- CAMPFIRE SAVE -->
+<div id="campfire-screen" class="screen hidden">
+  <div class="campfire-icon">🔥</div>
+  <div class="campfire-title">Campfire Rest</div>
+  <div class="campfire-sub" id="camp-loc">–</div>
+  <div style="margin-bottom:20px">
+    <div class="camp-stat">Spirit: <strong id="camp-spirit">–</strong></div>
+    <div class="camp-stat">Repentance Count: <strong id="camp-rep">–</strong></div>
+    <div class="camp-stat">Disciple: <strong id="camp-char">–</strong></div>
+  </div>
+  <button class="btn gold" onclick="continueFromCampfire()">Rest & Continue →</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover-screen" class="screen hidden">
+  <div class="go-title">The Fall</div>
+  <div class="go-sub">Your spirit has been extinguished</div>
+  <div class="go-text" id="go-text">
+    Consumed by darkness, you have walked the path of Judas.
+    Those you could have helped stand as silent witnesses to your fall.
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button class="btn gold" onclick="restoreFromCampfire()">Return to Last Campfire</button>
+    <button class="btn red" onclick="showScreen('title-screen')">Start Over</button>
+  </div>
+</div>
+
+<!-- VICTORY -->
+<div id="victory-screen" class="screen hidden">
+  <div style="font-size:48px;margin-bottom:16px">✝</div>
+  <div class="vic-title">The Way Fulfilled</div>
+  <div style="font-size:12px;letter-spacing:3px;color:#448844;margin-bottom:14px">Jerusalem Reached</div>
+  <div style="font-size:14px;color:rgba(255,255,255,.75);max-width:460px;text-align:center;line-height:1.9;margin-bottom:32px" id="vic-text">
+    You have walked the Way of the Cross with faith and endurance.
+  </div>
+  <div style="margin-bottom:24px">
+    <div class="camp-stat">Final Spirit: <strong id="vic-spirit" style="color:#88ee88">–</strong></div>
+    <div class="camp-stat">Times Repented: <strong id="vic-rep">–</strong></div>
+  </div>
+  <button class="btn gold" onclick="showScreen('title-screen')">Play Again</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GAME ENGINE
+══════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────
+// GAME STATE
+// ──────────────────────────────────────────
+const G = {
+  spiritMeter: 100,
+  repentanceCount: 0,
+  character: null,
+  locationIdx: 0,       // 0=Galilee, 1=Capernaum, 2=Jerusalem
+  actsThisLocation: 0,  // random acts before story mission
+  phase: 'act',         // 'act' | 'mission' | 'campfire'
+  campfire: {spirit:100, repentanceCount:0, locationIdx:0},
+  missionsDone: [false,false,false],
+  sinHistory: []
+};
+
+// ──────────────────────────────────────────
+// CHARACTERS
+// ──────────────────────────────────────────
+const CHARACTERS = [
+  {id:'peter', name:'Peter', title:'The Fisherman', icon:'🎣',
+   perk:'Sin losses from impulsive choices are reduced 20%',
+   desc:'Bold and passionate. Your impulsive spirit is tempered by grace.',
+   bonus: s => ({type:'sinReduction', amount:0.20})},
+  {id:'john', name:'John', title:'The Beloved', icon:'✝',
+   perk:'Righteous choices grant +5 bonus Spirit',
+   desc:'Beloved disciple. Your compassion deepens every righteous act.',
+   bonus: s => ({type:'righteousBonus', amount:5})},
+  {id:'james', name:'James', title:'Son of Thunder', icon:'⚡',
+   perk:'Story mission rewards are doubled',
+   desc:'Zealous and fierce. Your faith burns brightest in defining moments.',
+   bonus: s => ({type:'missionDouble'})},
+  {id:'mary', name:'Mary', title:'The Faithful', icon:'🌹',
+   perk:'Sacrifice Tasks restore +10 extra Spirit',
+   desc:'Steadfast and devoted. Your repentance carries extraordinary grace.',
+   bonus: s => ({type:'repentBonus', amount:10})},
+];
+
+// ──────────────────────────────────────────
+// LOCATIONS
+// ──────────────────────────────────────────
+const LOCATIONS = [
+  {name:'Galilee',      icon:'⚓', bg:'galilee.png',   actsNeeded:2, desc:'Begin beside the Sea of Galilee, where fishermen mend their nets and Jesus first calls His disciples.'},
+  {name:'Capernaum',   icon:'🏛', bg:'capernaum.png', actsNeeded:3, desc:'Journey to the city of miracles — crowded markets, synagogues, and souls hungry for healing.'},
+  {name:'Jerusalem',   icon:'🕍', bg:'jerusalem.png', actsNeeded:3, desc:'The Holy City awaits. The Temple gleams in golden light. The final chapter of the journey begins.'},
+];
+
+// ──────────────────────────────────────────
+// RANDOM ACTS EVENTS  (15 events)
+// ──────────────────────────────────────────
+const RANDOM_ACTS = [
+  {
+    title:'The Hungry Beggar',
+    text:'A skeletal old man sits at the roadside, hand outstretched. "Please, friend — I have not eaten since the Sabbath." Your own provision is modest.',
+    choices:[
+      {type:'righteous', label:'Share your meal fully', effect:+12, desc:'You sit with him and share everything you have, hearing his story.'},
+      {type:'neutral',   label:'Give a small coin',     effect:+3,  desc:'You drop a coin without stopping.'},
+      {type:'sinful',    label:'Walk past him',         effect:-10, desc:'You tell yourself someone else will help.'},
+    ]
+  },
+  {
+    title:'The Merchant\'s Deception',
+    text:'At the market, you witness a merchant charging three times the fair price to a poor widow who clearly doesn\'t know. She counts her last coins.',
+    choices:[
+      {type:'righteous', label:'Intervene on her behalf', effect:+14, desc:'You speak up — the crowd rallies, the merchant backs down.'},
+      {type:'neutral',   label:'Quietly warn the widow',  effect:+5,  desc:'You slip her a warning, but the merchant keeps his gain.'},
+      {type:'sinful',    label:'Purchase at the low rate', effect:-12, desc:'You exploit the insider knowledge for your own benefit.'},
+    ]
+  },
+  {
+    title:'The Sick Child',
+    text:'A mother kneels in the dust, her child burning with fever. She calls out to you: "Teacher, please — is there anything you can do?"',
+    choices:[
+      {type:'righteous', label:'Pray and stay until healed',  effect:+16, desc:'You lay hands on the child, pray with fervor, and wait. By evening, the fever breaks.'},
+      {type:'neutral',   label:'Pray briefly and move on',    effect:+4,  desc:'You offer a hurried prayer and continue your journey.'},
+      {type:'sinful',    label:'Claim you lack the power',    effect:-14, desc:'You dismiss her faith and leave her in despair.'},
+    ]
+  },
+  {
+    title:'The Tax Collector\'s Demand',
+    text:'A Roman tax collector seizes a farmer\'s only ox for unpaid taxes. The farmer weeps — without the ox, he cannot plant. His family will starve.',
+    choices:[
+      {type:'righteous', label:'Give your own money for the ox', effect:+18, desc:'You pay the debt yourself. The farmer falls to his knees in tears.'},
+      {type:'neutral',   label:'Negotiate a delay',              effect:+5,  desc:'You broker a one-week reprieve.'},
+      {type:'sinful',    label:'Side with the collector',        effect:-16, desc:'You validate Rome\'s authority over the suffering man.'},
+    ]
+  },
+  {
+    title:'The Temple Offering',
+    text:'At the treasury, a wealthy Pharisee makes a grand spectacle of his enormous donation. A poor woman quietly drops in two small coins — all she owns.',
+    choices:[
+      {type:'righteous', label:'Honor the widow publicly',    effect:+13, desc:'You tell those around you what true giving looks like.'},
+      {type:'neutral',   label:'Observe and reflect silently', effect:+2,  desc:'You keep your thoughts to yourself.'},
+      {type:'sinful',    label:'Mock the widow\'s small gift', effect:-15, desc:'You laugh with the Pharisees about her meager offering.'},
+    ]
+  },
+  {
+    title:'The Outcast Leper',
+    text:'A leper calls from the required distance: "Unclean! Unclean!" — but his eyes lock with yours and you see a person, desperate for acknowledgment.',
+    choices:[
+      {type:'righteous', label:'Approach and speak with him', effect:+15, desc:'Breaking custom, you draw near. "You are not forgotten," you say.'},
+      {type:'neutral',   label:'Nod and continue walking',   effect:+2,  desc:'A small gesture — better than nothing.'},
+      {type:'sinful',    label:'Shout for him to move away', effect:-13, desc:'You enforce the cruelty of the law without mercy.'},
+    ]
+  },
+  {
+    title:'The Borrowed Cloak',
+    text:'A friend asks to borrow your traveling cloak for the night — it\'s all you have. The night is cold. He has debts and you don\'t know if he\'ll return it.',
+    choices:[
+      {type:'righteous', label:'Give your cloak freely',  effect:+10, desc:'You shiver through the night, but your spirit is at peace.'},
+      {type:'neutral',   label:'Lend it reluctantly',     effect:+3,  desc:'You hand it over but spend the night in quiet resentment.'},
+      {type:'sinful',    label:'Refuse and lock the door', effect:-8, desc:'You keep warm, but your friend shivers in the dark.'},
+    ]
+  },
+  {
+    title:'The False Accusation',
+    text:'A powerful man publicly accuses an innocent traveler of theft. The crowd begins to turn. You know the truth — you were there.',
+    choices:[
+      {type:'righteous', label:'Speak up as a witness',     effect:+16, desc:'Risking the man\'s wrath, you defend the innocent traveler.'},
+      {type:'neutral',   label:'Slip the traveler a warning', effect:+5, desc:'You help quietly without drawing attention to yourself.'},
+      {type:'sinful',    label:'Stay silent to avoid trouble', effect:-14, desc:'The innocent man is beaten. You could have stopped it.'},
+    ]
+  },
+  {
+    title:'The Mourning Family',
+    text:'You pass a house of mourning. Inside, a family weeps over their father who died without proper burial rites. They cannot afford a priest.',
+    choices:[
+      {type:'righteous', label:'Lead the burial prayers yourself', effect:+14, desc:'You stay for hours, honoring the man with sacred words.'},
+      {type:'neutral',   label:'Contribute to a collection',       effect:+4,  desc:'You give money toward a proper burial.'},
+      {type:'sinful',    label:'Consider it none of your concern', effect:-10, desc:'You walk past the open door of grief.'},
+    ]
+  },
+  {
+    title:'The Prodigal\'s Return',
+    text:'Your own brother — the one who squandered the family money — has returned. Your father wants to throw a feast. You have every reason for resentment.',
+    choices:[
+      {type:'righteous', label:'Welcome him with open arms', effect:+15, desc:'You embrace your brother and join the celebration wholeheartedly.'},
+      {type:'neutral',   label:'Accept him but stay distant', effect:+3,  desc:'You don\'t celebrate, but you don\'t condemn him either.'},
+      {type:'sinful',    label:'Refuse to attend the feast',  effect:-12, desc:'Your bitterness poisons the homecoming.'},
+    ]
+  },
+  {
+    title:'The Roman Soldier',
+    text:'A Roman soldier orders you to carry his equipment for one mile — his legal right under law. The crowd watches, some of them friends.',
+    choices:[
+      {type:'righteous', label:'Carry it two miles willingly', effect:+13, desc:'The soldier is stunned. "Why?" "Because I choose to," you say.'},
+      {type:'neutral',   label:'Carry it exactly one mile',    effect:+2,  desc:'You fulfill the minimum obligation without complaint.'},
+      {type:'sinful',    label:'Argue and refuse loudly',      effect:-10, desc:'You incite a confrontation that ends badly for others nearby.'},
+    ]
+  },
+  {
+    title:'The Gambling Debt',
+    text:'A young man gambled away money he owed to an aggressive creditor. The creditor has him by the collar in the street, threatening violence.',
+    choices:[
+      {type:'righteous', label:'Pay the young man\'s debt',   effect:+17, desc:'You empty your purse. He stares at you in disbelief.'},
+      {type:'neutral',   label:'Mediate a repayment plan',    effect:+5,  desc:'You negotiate — the violence stops, the debt remains.'},
+      {type:'sinful',    label:'Bet on the creditor winning', effect:-18, desc:'You make a small profit off the young man\'s suffering.'},
+    ]
+  },
+  {
+    title:'The Night Visitor',
+    text:'A Pharisee knocks at your door at midnight, wanting to ask questions about faith in secret. He\'s risking his reputation just to speak with you.',
+    choices:[
+      {type:'righteous', label:'Welcome him and teach through the night', effect:+14, desc:'Like Nicodemus, he leaves before dawn, transformed.'},
+      {type:'neutral',   label:'Answer briefly then send him away',       effect:+4,  desc:'You give him something but not your full attention.'},
+      {type:'sinful',    label:'Mock his midnight secrecy publicly',      effect:-12, desc:'Your scorn closes a door that had barely opened.'},
+    ]
+  },
+  {
+    title:'The Broken Sabbath',
+    text:'On the Sabbath, a man\'s ox falls into a pit. The Pharisees nearby say it must wait until sunset. The animal suffers.',
+    choices:[
+      {type:'righteous', label:'Help rescue the animal now', effect:+11, desc:'"Which of you, if your ox falls into a pit, would not pull it out?" The animal is saved.'},
+      {type:'neutral',   label:'Report it to the synagogue leader', effect:+2, desc:'You follow protocol, adding delay but eventually the ox is freed.'},
+      {type:'sinful',    label:'Agree with the Pharisees strictly', effect:-9, desc:'You let religious rule override obvious mercy.'},
+    ]
+  },
+  {
+    title:'The Stolen Bread',
+    text:'You catch a child stealing bread from a market stall. The merchant hasn\'t noticed. The child is clearly starving, eyes wide with fear.',
+    choices:[
+      {type:'righteous', label:'Pay for the bread and let the child go', effect:+12, desc:'You quietly settle the debt and watch the child run, bread in hand.'},
+      {type:'neutral',   label:'Return the bread and scold the child',   effect:+2,  desc:'The child goes hungry but learns a lesson.'},
+      {type:'sinful',    label:'Report the child to the merchant',       effect:-11, desc:'The merchant\'s punishment is disproportionate and cruel.'},
+    ]
+  },
+];
+
+// ──────────────────────────────────────────
+// STORY MISSIONS (3 locations)
+// ──────────────────────────────────────────
+const STORY_MISSIONS = [
+  {
+    location:'Galilee',
+    badge:'Story Mission I',
+    title:'The First Calling',
+    text:'You stand at the shore of Galilee, watching Jesus speak to the crowd from Simon Peter\'s boat. As the crowd disperses, He turns to you directly. "Follow me," He says, "and I will make you a fisher of men." Your old life — your nets, your plans, your certainties — lies behind you.',
+    choices:[
+      {type:'righteous', label:'Leave everything and follow',      effect:+25, desc:'"At once they left their nets and followed Him." Your spirit leaps with purpose.'},
+      {type:'neutral',   label:'Ask for a day to consider it',    effect:+8,  desc:'He nods and waits. But the moment of full surrender passes.'},
+      {type:'sinful',    label:'Explain you have responsibilities', effect:-20, desc:'"Let the dead bury their own dead." You have chosen comfort over calling.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Capernaum',
+    badge:'Story Mission II',
+    title:'The Paralyzed Man',
+    text:'Four men cannot get their paralyzed friend through the door — the crowd is too thick. They climb to the roof and lower him through the tiles, desperate. Everyone watches Jesus. He looks at the man and says: "Your sins are forgiven." The Pharisees murmur. "Which is easier to say..." He turns to you.',
+    choices:[
+      {type:'righteous', label:'Declare faith openly before the Pharisees', effect:+25, desc:'You stand and speak. "This man is healed — I have witnessed it." The crowd stirs.'},
+      {type:'neutral',   label:'Watch in quiet awe and say nothing',        effect:+6,  desc:'The moment passes. Your faith remains private.'},
+      {type:'sinful',    label:'Side with the questioning Pharisees',       effect:-22, desc:'"How can this man forgive sins?" Your doubt becomes their weapon.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Jerusalem',
+    badge:'Story Mission III — Final',
+    title:'The Temple Courts',
+    text:'You enter the Temple and find it overrun — money changers, dove sellers, the stench of commerce in the house of God. Jesus overturns tables. In the chaos, the High Priest\'s guard approaches you: "Are you with this Galilean troublemaker?" Your answer will echo through history.',
+    choices:[
+      {type:'righteous', label:'"Yes — and I am not ashamed of it."', effect:+30, desc:'Your voice rings out. Some in the crowd turn. You stand firm.'},
+      {type:'neutral',   label:'Slip away in the confusion',          effect:+5,  desc:'You escape unharmed, but the question haunts you.'},
+      {type:'sinful',    label:'"I do not know the man."',            effect:-25, desc:'The words of Peter\'s denial come from your own mouth.'},
+    ],
+    isMission:true
+  }
+];
+
+// ──────────────────────────────────────────
+// SACRIFICE TASKS (after redemption)
+// ──────────────────────────────────────────
+const SACRIFICE_TASKS = [
+  {header:'A Fast and a Prayer', task:'Fast from sundown to sundown, spending the hours in prayer for those you have wronged. Let their faces pass before you.', cost:'Spirit restored to 100 · Repentance Count +1'},
+  {header:'Serve the Outcasts', task:'Give three days of labor to those the world has forgotten — the sick, the poor, the imprisoned. Ask nothing in return.', cost:'Spirit restored to 100 · Repentance Count +1'},
+  {header:'The Long Walk', task:'Walk barefoot to the nearest hill and kneel until your heart is softened. Leave behind one prized possession at the summit.', cost:'Spirit restored to 100 · Repentance Count +1'},
+  {header:'Speak the Truth', task:'Go to those you deceived or walked past and acknowledge what you did. No excuses. No qualifications. Just the truth.', cost:'Spirit restored to 100 · Repentance Count +1'},
+];
+
+// ──────────────────────────────────────────
+// AUDIO  (procedural synthesis — no external files)
+// ──────────────────────────────────────────
+let audioCtx = null;
+let currentMood = 'great';
+let audioInitialized = false;
+let _activeOscs = [], _activeMaster = null;
+
+function initAudio(){
+  if(audioInitialized) return;
+  audioInitialized = true;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  playMoodMusic(currentMood);
+}
+
+function stopCurrentMusic(fadeMs){
+  if(!_activeMaster) return;
+  const g = _activeMaster;
+  const t = audioCtx.currentTime;
+  g.gain.setTargetAtTime(0, t, fadeMs/3000);
+  const oscs = _activeOscs.slice();
+  setTimeout(()=>{ oscs.forEach(o=>{ try{ o.stop(); }catch(e){} }); }, fadeMs+200);
+  _activeOscs = [];
+  _activeMaster = null;
+}
+
+function playMoodMusic(mood){
+  if(!audioCtx) return;
+  stopCurrentMusic(800);
+  const t = audioCtx.currentTime + 0.05;
+
+  const master = audioCtx.createGain();
+  master.gain.setValueAtTime(0, t);
+  master.gain.setTargetAtTime(0.28, t, 0.6);
+  master.connect(audioCtx.destination);
+  _activeMaster = master;
+
+  // Reverb (simple convolver)
+  const convLen = audioCtx.sampleRate * 2.5;
+  const convBuf = audioCtx.createBuffer(2, convLen, audioCtx.sampleRate);
+  for(let ch=0; ch<2; ch++){
+    const d = convBuf.getChannelData(ch);
+    for(let i=0; i<convLen; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/convLen, 2.2);
+  }
+  const rev = audioCtx.createConvolver(); rev.buffer = convBuf;
+  const revGain = audioCtx.createGain(); revGain.gain.value = 0.35;
+  rev.connect(revGain); revGain.connect(master);
+
+  function addOsc(freq, type, gainVal, detune, lfoRate, lfoDepth, startT){
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    if(detune) o.detune.value = detune;
+    g.gain.setValueAtTime(0, startT);
+    g.gain.setTargetAtTime(gainVal, startT, 0.8);
+    if(lfoRate && lfoDepth){
+      const lfo = audioCtx.createOscillator();
+      const lfoG = audioCtx.createGain();
+      lfo.frequency.value = lfoRate; lfoG.gain.value = lfoDepth;
+      lfo.connect(lfoG); lfoG.connect(o.frequency);
+      lfo.start(startT); _activeOscs.push(lfo);
+    }
+    o.connect(g); g.connect(master); g.connect(rev);
+    o.start(startT);
+    _activeOscs.push(o);
+    return o;
+  }
+
+  if(mood === 'great'){
+    // C major pentatonic shimmer — warm & uplifting
+    [[261.6,'sine',0.18,0,0.15,3],[329.6,'sine',0.14,5,0.12,4],
+     [392,'sine',0.11,-3,0.10,5],[523.2,'sine',0.07,8,0.08,6],
+     [196,'sine',0.22,-2,0.06,2]].forEach(([f,tp,gv,dt,lr,ld])=>{
+      addOsc(f,tp,gv,dt,lr,ld,t);
+    });
+  } else if(mood === 'troubled'){
+    // A minor drone — unsettled, haunting
+    [[220,'sawtooth',0.08,0,0.5,8],[329.6,'triangle',0.10,7,0.3,6],
+     [261.6,'sine',0.12,-4,0.2,5],[110,'sine',0.18,0,0.15,3],
+     [440,'triangle',0.05,12,0.4,4]].forEach(([f,tp,gv,dt,lr,ld])=>{
+      addOsc(f,tp,gv,dt,lr,ld,t);
+    });
+    // Dissonant bell overtone
+    addOsc(466.2,'sine',0.04,0,0.7,12,t+1.5);
+  } else if(mood === 'satan'){
+    // Diminished / dark — ominous dread
+    [[123.5,'sawtooth',0.15,0,0.3,10],[174.6,'sawtooth',0.10,6,0.4,8],
+     [207.7,'sawtooth',0.08,-8,0.5,12],[61.7,'sine',0.25,0,0.1,3],
+     [246.9,'square',0.04,0,1.1,15]].forEach(([f,tp,gv,dt,lr,ld])=>{
+      addOsc(f,tp,gv,dt,lr,ld,t);
+    });
+    // Waveshaper distortion
+    const wsDist = audioCtx.createWaveShaper();
+    const wsN = 256; const wsCurve = new Float32Array(wsN);
+    for(let i=0;i<wsN;i++){ const x=i*2/wsN-1; wsCurve[i]=Math.tanh(x*4); }
+    wsDist.curve = wsCurve;
+    _activeOscs.forEach(o=>{
+      if(o.type==='sawtooth') try{ o.connect(wsDist); }catch(e){}
+    });
+    wsDist.connect(master);
+  } else {
+    // Ambient G major — peaceful
+    [[196,'sine',0.15,0,0.10,3],[246.9,'sine',0.12,4,0.12,4],
+     [293.7,'sine',0.09,-3,0.08,5],[392,'sine',0.07,6,0.06,6],
+     [130.8,'sine',0.20,-1,0.07,2]].forEach(([f,tp,gv,dt,lr,ld])=>{
+      addOsc(f,tp,gv,dt,lr,ld,t);
+    });
+  }
+}
+
+// ──────────────────────────────────────────
+// PARTICLES
+// ──────────────────────────────────────────
+const cv = document.getElementById('particles');
+cv.width = window.innerWidth; cv.height = window.innerHeight;
+const ctx2 = cv.getContext('2d');
+let pcfg = {color:'#ffe88a',glow:'#ffd050',count:80,vy:-0.5};
+const parts = Array.from({length:120},()=>({
+  x:Math.random()*cv.width, y:Math.random()*cv.height,
+  vx:(Math.random()-.5)*.5, vy:Math.random()*-1-.2,
+  life:Math.random(), maxLife:.8+Math.random()*.8,
+  size:1+Math.random()*2.5
+}));
+
+function tickParticles(){
+  ctx2.clearRect(0,0,cv.width,cv.height);
+  const active = parts.slice(0,pcfg.count);
+  active.forEach(p=>{
+    p.life+=.004;
+    if(p.life>p.maxLife){ p.life=0;p.x=Math.random()*cv.width;p.y=cv.height+20; }
+    const t=p.life/p.maxLife;
+    const alpha=(t<.2?t/.2:t>.8?(1-t)/.2:1)*.65;
+    p.x+=p.vx+Math.sin(p.life*2)*.2; p.y+=pcfg.vy;
+    ctx2.save();
+    ctx2.globalAlpha=alpha;
+    ctx2.shadowColor=pcfg.glow; ctx2.shadowBlur=8;
+    ctx2.fillStyle=pcfg.color;
+    ctx2.beginPath();ctx2.arc(p.x,p.y,p.size*(0.5+t*.5),0,Math.PI*2);ctx2.fill();
+    ctx2.restore();
+  });
+  requestAnimationFrame(tickParticles);
+}
+tickParticles();
+
+// ──────────────────────────────────────────
+// SCREEN MANAGEMENT
+// ──────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  const el = document.getElementById(id);
+  if(el){ el.classList.remove('hidden'); }
+}
+
+function flashScreen(color='#fff', duration=600){
+  const f = document.getElementById('flash');
+  f.style.background = color;
+  f.style.transition = 'none';
+  f.style.opacity = '0.85';
+  setTimeout(()=>{
+    f.style.transition = `opacity ${duration}ms ease`;
+    f.style.opacity = '0';
+  }, 80);
+}
+
+// ──────────────────────────────────────────
+// SPIRIT SYSTEM
+// ──────────────────────────────────────────
+function applySpirit(delta){
+  G.spiritMeter = Math.max(0, Math.min(100, G.spiritMeter + delta));
+  updateHUD();
+  updateMood();
+  if(G.spiritMeter <= 0) triggerGameOver();
+}
+
+function sinLoss(base){
+  const mult = 1 + G.repentanceCount;
+  let loss = base * mult;
+  if(G.character?.id === 'peter') loss *= 0.8;
+  return -Math.round(loss);
+}
+
+function righteousGain(base){
+  let gain = base;
+  if(G.character?.id === 'john') gain += 5;
+  return Math.round(gain);
+}
+
+function missionReward(base){
+  let gain = base;
+  if(G.character?.id === 'james') gain *= 2;
+  return Math.round(gain);
+}
+
+function updateHUD(){
+  const pct = Math.round(G.spiritMeter);
+  document.getElementById('spirit-fill').style.width = pct+'%';
+  const color = pct>75?'#88ddaa':pct>30?'#ffaa22':'#ff4422';
+  document.getElementById('spirit-fill').style.background = color;
+  document.getElementById('spirit-fill').style.boxShadow = `0 0 10px ${color}`;
+  document.getElementById('spirit-num').textContent = pct+'%';
+  document.getElementById('spirit-num').style.color = color;
+}
+
+function updateMood(){
+  const sp = G.spiritMeter;
+  let mood = sp>75?'great':sp>30?'troubled':'satan';
+  if(mood===currentMood) return;
+  currentMood = mood;
+  const bg = document.getElementById('bg');
+  const rays = document.getElementById('rays');
+  const BG_GRADIENTS = {
+    great:    'linear-gradient(180deg,#0a0601 0%,#1f1008 8%,#4a2510 25%,#8b4513 45%,#c48020 60%,#e8b840 72%,#f5d575 82%,#ffe898 90%,#fff5d0 100%)',
+    troubled: 'linear-gradient(180deg,#080b10 0%,#141820 15%,#1e2535 35%,#2a3445 55%,#3a4560 70%,#4a5570 80%,#60687a 90%,#72788a 100%)',
+    satan:    'linear-gradient(180deg,#060001 0%,#150304 10%,#240509 25%,#3a0810 45%,#550c18 60%,#6a0f1e 75%,#3a0810 88%,#060001 100%)',
+  };
+  bg.style.backgroundImage = '';
+  bg.style.background = BG_GRADIENTS[mood] || BG_GRADIENTS.great;
+  bg.className = mood;
+  rays.className = mood;
+  // Particles
+  if(mood==='great'){ pcfg={color:'#ffe88a',glow:'#ffd050',count:80,vy:-0.5}; }
+  else if(mood==='troubled'){ pcfg={color:'#aabbcc',glow:'#8899bb',count:40,vy:-0.3}; }
+  else { pcfg={color:'#ff6622',glow:'#ff2200',count:100,vy:-0.4}; }
+  // Satan overlays
+  const isS = mood==='satan';
+  document.getElementById('satan-pulse').style.display = isS?'block':'none';
+  document.getElementById('scan').style.display = isS?'block':'none';
+  document.getElementById('lightning').style.display = isS?'block':'none';
+  // Audio
+  if(audioCtx) playMoodMusic(mood);
+}
+
+// ──────────────────────────────────────────
+// CHARACTER SELECT
+// ──────────────────────────────────────────
+function buildCharGrid(){
+  const grid = document.getElementById('char-grid');
+  grid.innerHTML = CHARACTERS.map(c=>`
+    <div class="char-card" id="card-${c.id}" onclick="selectChar('${c.id}')">
+      <div class="char-icon">${c.icon}</div>
+      <div class="char-name">${c.name}</div>
+      <div class="char-title">${c.title}</div>
+      <div class="char-perk"><strong>Perk:</strong> ${c.perk}</div>
+    </div>`).join('');
+}
+
+function selectChar(id){
+  document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('card-'+id).classList.add('selected');
+  G.character = CHARACTERS.find(c=>c.id===id);
+  const btn = document.getElementById('start-btn');
+  btn.disabled = false; btn.style.opacity='1';
+}
+
+// ──────────────────────────────────────────
+// GAME START
+// ──────────────────────────────────────────
+function startGame(){
+  if(!G.character) return;
+  G.spiritMeter=100; G.repentanceCount=0; G.locationIdx=0;
+  G.actsThisLocation=0; G.phase='act'; G.missionsDone=[false,false,false];
+  G.campfire={spirit:100,repentanceCount:0,locationIdx:0};
+  document.getElementById('char-badge').textContent = G.character.name;
+  document.getElementById('hud').classList.remove('hidden');
+  updateHUD();
+  flashScreen('#fff', 800);
+  setTimeout(()=>showMap(), 400);
+  // Init audio on first interaction
+  initAudio();
+}
+
+// ──────────────────────────────────────────
+// MAP
+// ──────────────────────────────────────────
+function showMap(){
+  const loc = LOCATIONS[G.locationIdx];
+  // Set background to location image
+  const LOC_GRADIENTS = {
+    'galilee.png':    'linear-gradient(180deg,#091830 0%,#132a50 20%,#1a4070 45%,#2a6090 62%,#3a7aa0 72%,#4a6858 80%,#3d5a40 90%,#2e4530 100%)',
+    'capernaum.png':  'linear-gradient(180deg,#0c0a06 0%,#201810 15%,#3a2c18 30%,#5a4025 50%,#7a5a30 65%,#9a7a45 78%,#b89060 88%,#c8a070 100%)',
+    'jerusalem.png':  'linear-gradient(180deg,#060408 0%,#150e0a 12%,#2a1a0c 28%,#4a2f12 45%,#7a5020 62%,#a87838 76%,#c8a050 85%,#e8c860 95%,#f8e090 100%)',
+  };
+  const bg_el = document.getElementById('bg');
+  bg_el.style.backgroundImage = '';
+  bg_el.style.background = LOC_GRADIENTS[loc.bg] || LOC_GRADIENTS['galilee.png'];
+  document.getElementById('location-label').textContent = loc.name;
+
+  // Build journey nodes
+  const jp = document.getElementById('journey-path');
+  jp.innerHTML = LOCATIONS.map((l,i)=>{
+    const state = i<G.locationIdx?'done':i===G.locationIdx?'current':'locked';
+    const arrow = i<2?'<span class="map-arrow">→</span>':'';
+    return `<div class="map-node">
+      <div class="map-dot ${state}">${l.icon}</div>
+      <div class="map-name ${state==='current'?'current':''}">${l.name}</div>
+    </div>${arrow}`;
+  }).join('');
+
+  document.getElementById('map-desc').textContent = loc.desc;
+  document.getElementById('map-btn').textContent = `Enter ${loc.name} →`;
+  showScreen('map-screen');
+}
+
+function enterLocation(){
+  flashScreen('#fff', 600);
+  setTimeout(()=>nextEvent(), 300);
+}
+
+// ──────────────────────────────────────────
+// EVENT FLOW
+// ──────────────────────────────────────────
+function nextEvent(){
+  const loc = LOCATIONS[G.locationIdx];
+  if(!G.missionsDone[G.locationIdx] && G.actsThisLocation >= loc.actsNeeded){
+    // Time for story mission
+    showMission(STORY_MISSIONS[G.locationIdx]);
+  } else {
+    showRandomAct();
+  }
+}
+
+// ──────────────────────────────────────────
+// RANDOM ACT
+// ──────────────────────────────────────────
+let usedActs = [];
+function showRandomAct(){
+  let available = RANDOM_ACTS.filter((_,i)=>!usedActs.includes(i));
+  if(available.length===0){ usedActs=[]; available=RANDOM_ACTS; }
+  const idx = Math.floor(Math.random()*available.length);
+  const act = available[idx];
+  usedActs.push(RANDOM_ACTS.indexOf(act));
+  showEvent(act, false);
+}
+
+// ──────────────────────────────────────────
+// STORY MISSION
+// ──────────────────────────────────────────
+function showMission(mission){
+  showEvent(mission, true);
+}
+
+// ──────────────────────────────────────────
+// SHOW EVENT (shared display)
+// ──────────────────────────────────────────
+function showEvent(event, isMission){
+  document.getElementById('mission-badge').textContent = isMission? event.badge : 'Random Act';
+  document.getElementById('mission-badge').style.color = isMission?'#e8d080':'#888';
+  document.getElementById('mission-title').textContent = event.title;
+  document.getElementById('mission-text').textContent = event.text;
+
+  const cc = document.getElementById('mission-choices');
+  cc.innerHTML = event.choices.map((c,i)=>{
+    let effectDesc='', tagClass='n', tagText='Neutral';
+    if(c.type==='righteous'){ tagClass='r'; tagText='Righteous'; effectDesc=`+${righteousGain(c.effect)} Spirit`; }
+    else if(c.type==='sinful'){ tagClass='s'; tagText='Sinful';
+      const loss = sinLoss(-c.effect);
+      effectDesc=`${loss} Spirit${G.repentanceCount>0?' (×'+(1+G.repentanceCount)+' multiplier)':''}`;
+    } else { effectDesc=`+${c.effect} Spirit`; }
+    if(isMission){
+      if(c.type==='righteous'){ const gain=missionReward(c.effect); effectDesc=`+${righteousGain(gain)} Spirit`+(G.character?.id==='james'?' (×2 James bonus)':''); }
+      else if(c.type==='sinful'){ const loss=sinLoss(-c.effect); effectDesc=`${loss} Spirit`; }
+    }
+    return `<button class="choice-btn ${c.type}" onclick="makeChoice(${i},${JSON.stringify(event).replace(/</g,'\\u003c').replace(/>/g,'\\u003e')},${isMission})">
+      <span class="choice-tag ${tagClass}">${tagText}</span>
+      <div><div class="choice-text">${c.label}</div><div class="choice-cost">${effectDesc}</div></div>
+    </button>`;
+  }).join('');
+
+  showScreen('mission-screen');
+}
+
+// ──────────────────────────────────────────
+// CHOICE HANDLER
+// ──────────────────────────────────────────
+function makeChoice(choiceIdx, event, isMission){
+  const choice = event.choices[choiceIdx];
+  let delta = 0, icon='', title='', flash='#fff';
+
+  if(choice.type==='righteous'){
+    delta = isMission? righteousGain(missionReward(choice.effect)) : righteousGain(choice.effect);
+    icon='✨'; title='Righteous Act'; flash='rgba(200,255,200,0.5)';
+  } else if(choice.type==='sinful'){
+    delta = sinLoss(-choice.effect);
+    icon='💀'; title='Sin Committed'; flash='rgba(200,30,0,0.3)';
+    G.sinHistory.push({event:event.title, choice:choice.label});
+    // Camera shake
+    document.getElementById('bg').classList.add('shake');
+    setTimeout(()=>document.getElementById('bg').classList.remove('shake'),400);
+  } else {
+    delta = choice.effect;
+    icon='📖'; title='Neutral Path'; flash='rgba(200,200,100,0.2)';
+  }
+
+  if(isMission) G.missionsDone[G.locationIdx]=true;
+  else G.actsThisLocation++;
+
+  showConsequence(icon, title, delta, choice.desc);
+  flashScreen(flash, 500);
+  applySpirit(delta);
+
+  setTimeout(()=>{
+    hideConsequence();
+    if(G.spiritMeter <= 0) return;
+    // Check if spirit is very low — offer repentance
+    if(G.spiritMeter < 30 && Math.random()<0.55){
+      setTimeout(()=>showRepentance(), 400);
+    } else if(isMission){
+      setTimeout(()=>showCampfire(), 400);
+    } else {
+      setTimeout(()=>nextEvent(), 400);
+    }
+  }, 2800);
+}
+
+// ──────────────────────────────────────────
+// CONSEQUENCE BANNER
+// ──────────────────────────────────────────
+function showConsequence(icon, title, delta, desc){
+  document.getElementById('con-icon').textContent = icon;
+  document.getElementById('con-title').textContent = title;
+  const sign = delta>0?'+':'';
+  document.getElementById('con-change').textContent = `${sign}${delta} Spirit`;
+  document.getElementById('con-change').style.color = delta>0?'#88ee88':'#ff6644';
+  document.getElementById('con-desc').textContent = desc;
+  const el = document.getElementById('consequence');
+  el.classList.add('show');
+}
+function hideConsequence(){
+  document.getElementById('consequence').classList.remove('show');
+}
+
+// ──────────────────────────────────────────
+// REPENTANCE / SACRIFICE TASK
+// ──────────────────────────────────────────
+function showRepentance(){
+  const task = SACRIFICE_TASKS[Math.floor(Math.random()*SACRIFICE_TASKS.length)];
+  let costText = task.cost;
+  if(G.character?.id==='mary') costText += ' · +10 Bonus (Mary\'s Grace)';
+  document.getElementById('repent-header').textContent = task.header;
+  document.getElementById('repent-task').textContent = task.task;
+  document.getElementById('repent-cost').textContent = costText;
+  showScreen('repent-screen');
+}
+
+function completeRepentance(){
+  let restore = 100 - G.spiritMeter;
+  if(G.character?.id==='mary') restore += 10;
+  G.spiritMeter = Math.min(100, G.spiritMeter + restore);
+  G.repentanceCount++;
+  flashScreen('rgba(200,255,200,0.4)', 800);
+  showConsequence('🙏','Redemption',restore,'Your spirit has been restored through sacrifice.');
+  applySpirit(0); // refresh HUD without extra delta
+  setTimeout(()=>{ hideConsequence(); setTimeout(()=>nextEvent(),300); }, 2800);
+}
+
+function skipRepentance(){
+  nextEvent();
+}
+
+// ──────────────────────────────────────────
+// CAMPFIRE SAVE
+// ──────────────────────────────────────────
+function showCampfire(){
+  const loc = LOCATIONS[G.locationIdx];
+  document.getElementById('camp-loc').textContent = loc.name+' — Location Completed';
+  document.getElementById('camp-spirit').textContent = Math.round(G.spiritMeter)+'%';
+  document.getElementById('camp-rep').textContent = G.repentanceCount;
+  document.getElementById('camp-char').textContent = G.character.name+', '+G.character.title;
+  // Save
+  G.campfire = {spirit:G.spiritMeter, repentanceCount:G.repentanceCount, locationIdx:G.locationIdx};
+  saveGame();
+  showScreen('campfire-screen');
+}
+
+function continueFromCampfire(){
+  G.locationIdx++;
+  G.actsThisLocation=0;
+  if(G.locationIdx >= LOCATIONS.length){
+    showVictory();
+  } else {
+    flashScreen('#fff', 600);
+    setTimeout(()=>showMap(), 300);
+  }
+}
+
+// ──────────────────────────────────────────
+// GAME OVER
+// ──────────────────────────────────────────
+function triggerGameOver(){
+  // Satan's Grasp sequence
+  const bg_go = document.getElementById('bg');
+  bg_go.style.backgroundImage = '';
+  bg_go.style.background = 'linear-gradient(180deg,#060001 0%,#150304 10%,#240509 25%,#3a0810 45%,#550c18 60%,#6a0f1e 75%,#3a0810 88%,#060001 100%)';
+  document.getElementById('bg').className = 'satan';
+  document.getElementById('satan-pulse').style.display='block';
+  document.getElementById('scan').style.display='block';
+  document.getElementById('lightning').style.display='block';
+  if(audioCtx) playMoodMusic('satan');
+  flashScreen('rgba(180,20,5,0.6)', 1200);
+  const sins = G.sinHistory.slice(-3).map(s=>s.event).join(', ');
+  document.getElementById('go-text').textContent =
+    'Consumed by darkness, you have walked the path of Judas. '+
+    (sins?`You turned away from: ${sins}. `:'')+'Return to the last campfire and choose differently.';
+  setTimeout(()=>showScreen('gameover-screen'), 1000);
+}
+
+function restoreFromCampfire(){
+  G.spiritMeter = G.campfire.spirit||50;
+  G.repentanceCount = G.campfire.repentanceCount||0;
+  G.locationIdx = G.campfire.locationIdx||0;
+  G.actsThisLocation = 0;
+  G.missionsDone[G.locationIdx] = false;
+  updateHUD(); updateMood();
+  flashScreen('#fff',600);
+  setTimeout(()=>showMap(),300);
+}
+
+// ──────────────────────────────────────────
+// VICTORY
+// ──────────────────────────────────────────
+function showVictory(){
+  const bg_v = document.getElementById('bg');
+  bg_v.style.backgroundImage = '';
+  bg_v.style.background = 'linear-gradient(180deg,#060408 0%,#150e0a 12%,#2a1a0c 28%,#4a2f12 45%,#7a5020 62%,#a87838 76%,#c8a050 85%,#e8c860 95%,#f8e090 100%)';
+  document.getElementById('bg').className = 'great';
+  const sp = Math.round(G.spiritMeter);
+  document.getElementById('vic-spirit').textContent = sp+'%';
+  document.getElementById('vic-rep').textContent = G.repentanceCount+' time'+(G.repentanceCount===1?'':'s');
+  const grade = sp>85?'a true saint':sp>65?'a faithful disciple':sp>45?'a sincere pilgrim':'a struggling seeker';
+  document.getElementById('vic-text').textContent =
+    `You have walked the Way of the Cross with ${G.character.name}'s spirit intact. History will remember you as ${grade}. The Way is fulfilled.`;
+  flashScreen('rgba(200,255,200,0.5)',800);
+  setTimeout(()=>showScreen('victory-screen'),400);
+}
+
+// ──────────────────────────────────────────
+// SAVE / LOAD
+// ──────────────────────────────────────────
+function saveGame(){
+  try{
+    localStorage.setItem('apostle_save', JSON.stringify({
+      spirit:G.spiritMeter, rep:G.repentanceCount,
+      charId:G.character?.id, locIdx:G.locationIdx,
+      missionsDone:G.missionsDone, campfire:G.campfire
+    }));
+  }catch(e){}
+}
+
+function loadGame(){
+  try{
+    const s = JSON.parse(localStorage.getItem('apostle_save')||'null');
+    if(!s){ alert('No saved game found.'); return; }
+    G.character = CHARACTERS.find(c=>c.id===s.charId)||CHARACTERS[0];
+    G.spiritMeter = s.spirit||100; G.repentanceCount = s.rep||0;
+    G.locationIdx = s.locIdx||0; G.missionsDone = s.missionsDone||[false,false,false];
+    G.campfire = s.campfire||{spirit:100,repentanceCount:0,locationIdx:0};
+    G.actsThisLocation = 0;
+    document.getElementById('char-badge').textContent = G.character.name;
+    document.getElementById('hud').classList.remove('hidden');
+    updateHUD(); updateMood(); initAudio();
+    flashScreen('#fff',600);
+    setTimeout(()=>showMap(),300);
+  }catch(e){ alert('Could not load save.'); }
+}
+
+// ──────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────
+buildCharGrid();
+// Set initial background gradient
+(function(){
+  const b = document.getElementById('bg');
+  b.style.background = 'linear-gradient(180deg,#0a0601 0%,#1f1008 8%,#4a2510 25%,#8b4513 45%,#c48020 60%,#e8b840 72%,#f5d575 82%,#ffe898 90%,#fff5d0 100%)';
+})();
+window.addEventListener('resize',()=>{ cv.width=window.innerWidth; cv.height=window.innerHeight; });
+// Enable audio on first click
+document.addEventListener('click',()=>{ if(!audioInitialized) initAudio(); },{once:true});
+</script>
+</body>
+</html>
