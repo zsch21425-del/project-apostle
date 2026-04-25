@@ -401,188 +401,718 @@ const LOCATIONS = [
   {name:'Jerusalem',   icon:'🕍', bg:'jerusalem.png', actsNeeded:3, desc:'The Holy City awaits. The Temple gleams in golden light. The final chapter of the journey begins.'},
 ];
 
-// ──────────────────────────────────────────
-// RANDOM ACTS EVENTS  (15 events)
-// ──────────────────────────────────────────
-const RANDOM_ACTS = [
-  {
-    title:'The Hungry Beggar',
-    text:'A skeletal old man sits at the roadside, hand outstretched. "Please, friend — I have not eaten since the Sabbath." Your own provision is modest.',
-    choices:[
-      {type:'righteous', label:'Share your meal fully', effect:+12, desc:'You sit with him and share everything you have, hearing his story.'},
-      {type:'neutral',   label:'Give a small coin',     effect:+3,  desc:'You drop a coin without stopping.'},
-      {type:'sinful',    label:'Walk past him',         effect:-10, desc:'You tell yourself someone else will help.'},
-    ]
-  },
-  {
-    title:'The Merchant\'s Deception',
-    text:'At the market, you witness a merchant charging three times the fair price to a poor widow who clearly doesn\'t know. She counts her last coins.',
-    choices:[
-      {type:'righteous', label:'Intervene on her behalf', effect:+14, desc:'You speak up — the crowd rallies, the merchant backs down.'},
-      {type:'neutral',   label:'Quietly warn the widow',  effect:+5,  desc:'You slip her a warning, but the merchant keeps his gain.'},
-      {type:'sinful',    label:'Purchase at the low rate', effect:-12, desc:'You exploit the insider knowledge for your own benefit.'},
-    ]
-  },
-  {
-    title:'The Sick Child',
-    text:'A mother kneels in the dust, her child burning with fever. She calls out to you: "Teacher, please — is there anything you can do?"',
-    choices:[
-      {type:'righteous', label:'Pray and stay until healed',  effect:+16, desc:'You lay hands on the child, pray with fervor, and wait. By evening, the fever breaks.'},
-      {type:'neutral',   label:'Pray briefly and move on',    effect:+4,  desc:'You offer a hurried prayer and continue your journey.'},
-      {type:'sinful',    label:'Claim you lack the power',    effect:-14, desc:'You dismiss her faith and leave her in despair.'},
-    ]
-  },
-  {
-    title:'The Tax Collector\'s Demand',
-    text:'A Roman tax collector seizes a farmer\'s only ox for unpaid taxes. The farmer weeps — without the ox, he cannot plant. His family will starve.',
-    choices:[
-      {type:'righteous', label:'Give your own money for the ox', effect:+18, desc:'You pay the debt yourself. The farmer falls to his knees in tears.'},
-      {type:'neutral',   label:'Negotiate a delay',              effect:+5,  desc:'You broker a one-week reprieve.'},
-      {type:'sinful',    label:'Side with the collector',        effect:-16, desc:'You validate Rome\'s authority over the suffering man.'},
-    ]
-  },
-  {
-    title:'The Temple Offering',
-    text:'At the treasury, a wealthy Pharisee makes a grand spectacle of his enormous donation. A poor woman quietly drops in two small coins — all she owns.',
-    choices:[
-      {type:'righteous', label:'Honor the widow publicly',    effect:+13, desc:'You tell those around you what true giving looks like.'},
-      {type:'neutral',   label:'Observe and reflect silently', effect:+2,  desc:'You keep your thoughts to yourself.'},
-      {type:'sinful',    label:'Mock the widow\'s small gift', effect:-15, desc:'You laugh with the Pharisees about her meager offering.'},
-    ]
-  },
-  {
-    title:'The Outcast Leper',
-    text:'A leper calls from the required distance: "Unclean! Unclean!" — but his eyes lock with yours and you see a person, desperate for acknowledgment.',
-    choices:[
-      {type:'righteous', label:'Approach and speak with him', effect:+15, desc:'Breaking custom, you draw near. "You are not forgotten," you say.'},
-      {type:'neutral',   label:'Nod and continue walking',   effect:+2,  desc:'A small gesture — better than nothing.'},
-      {type:'sinful',    label:'Shout for him to move away', effect:-13, desc:'You enforce the cruelty of the law without mercy.'},
-    ]
-  },
-  {
-    title:'The Borrowed Cloak',
-    text:'A friend asks to borrow your traveling cloak for the night — it\'s all you have. The night is cold. He has debts and you don\'t know if he\'ll return it.',
-    choices:[
-      {type:'righteous', label:'Give your cloak freely',  effect:+10, desc:'You shiver through the night, but your spirit is at peace.'},
-      {type:'neutral',   label:'Lend it reluctantly',     effect:+3,  desc:'You hand it over but spend the night in quiet resentment.'},
-      {type:'sinful',    label:'Refuse and lock the door', effect:-8, desc:'You keep warm, but your friend shivers in the dark.'},
-    ]
-  },
-  {
-    title:'The False Accusation',
-    text:'A powerful man publicly accuses an innocent traveler of theft. The crowd begins to turn. You know the truth — you were there.',
-    choices:[
-      {type:'righteous', label:'Speak up as a witness',     effect:+16, desc:'Risking the man\'s wrath, you defend the innocent traveler.'},
-      {type:'neutral',   label:'Slip the traveler a warning', effect:+5, desc:'You help quietly without drawing attention to yourself.'},
-      {type:'sinful',    label:'Stay silent to avoid trouble', effect:-14, desc:'The innocent man is beaten. You could have stopped it.'},
-    ]
-  },
-  {
-    title:'The Mourning Family',
-    text:'You pass a house of mourning. Inside, a family weeps over their father who died without proper burial rites. They cannot afford a priest.',
-    choices:[
-      {type:'righteous', label:'Lead the burial prayers yourself', effect:+14, desc:'You stay for hours, honoring the man with sacred words.'},
-      {type:'neutral',   label:'Contribute to a collection',       effect:+4,  desc:'You give money toward a proper burial.'},
-      {type:'sinful',    label:'Consider it none of your concern', effect:-10, desc:'You walk past the open door of grief.'},
-    ]
-  },
-  {
-    title:'The Prodigal\'s Return',
-    text:'Your own brother — the one who squandered the family money — has returned. Your father wants to throw a feast. You have every reason for resentment.',
-    choices:[
-      {type:'righteous', label:'Welcome him with open arms', effect:+15, desc:'You embrace your brother and join the celebration wholeheartedly.'},
-      {type:'neutral',   label:'Accept him but stay distant', effect:+3,  desc:'You don\'t celebrate, but you don\'t condemn him either.'},
-      {type:'sinful',    label:'Refuse to attend the feast',  effect:-12, desc:'Your bitterness poisons the homecoming.'},
-    ]
-  },
-  {
-    title:'The Roman Soldier',
-    text:'A Roman soldier orders you to carry his equipment for one mile — his legal right under law. The crowd watches, some of them friends.',
-    choices:[
-      {type:'righteous', label:'Carry it two miles willingly', effect:+13, desc:'The soldier is stunned. "Why?" "Because I choose to," you say.'},
-      {type:'neutral',   label:'Carry it exactly one mile',    effect:+2,  desc:'You fulfill the minimum obligation without complaint.'},
-      {type:'sinful',    label:'Argue and refuse loudly',      effect:-10, desc:'You incite a confrontation that ends badly for others nearby.'},
-    ]
-  },
-  {
-    title:'The Gambling Debt',
-    text:'A young man gambled away money he owed to an aggressive creditor. The creditor has him by the collar in the street, threatening violence.',
-    choices:[
-      {type:'righteous', label:'Pay the young man\'s debt',   effect:+17, desc:'You empty your purse. He stares at you in disbelief.'},
-      {type:'neutral',   label:'Mediate a repayment plan',    effect:+5,  desc:'You negotiate — the violence stops, the debt remains.'},
-      {type:'sinful',    label:'Bet on the creditor winning', effect:-18, desc:'You make a small profit off the young man\'s suffering.'},
-    ]
-  },
-  {
-    title:'The Night Visitor',
-    text:'A Pharisee knocks at your door at midnight, wanting to ask questions about faith in secret. He\'s risking his reputation just to speak with you.',
-    choices:[
-      {type:'righteous', label:'Welcome him and teach through the night', effect:+14, desc:'Like Nicodemus, he leaves before dawn, transformed.'},
-      {type:'neutral',   label:'Answer briefly then send him away',       effect:+4,  desc:'You give him something but not your full attention.'},
-      {type:'sinful',    label:'Mock his midnight secrecy publicly',      effect:-12, desc:'Your scorn closes a door that had barely opened.'},
-    ]
-  },
-  {
-    title:'The Broken Sabbath',
-    text:'On the Sabbath, a man\'s ox falls into a pit. The Pharisees nearby say it must wait until sunset. The animal suffers.',
-    choices:[
-      {type:'righteous', label:'Help rescue the animal now', effect:+11, desc:'"Which of you, if your ox falls into a pit, would not pull it out?" The animal is saved.'},
-      {type:'neutral',   label:'Report it to the synagogue leader', effect:+2, desc:'You follow protocol, adding delay but eventually the ox is freed.'},
-      {type:'sinful',    label:'Agree with the Pharisees strictly', effect:-9, desc:'You let religious rule override obvious mercy.'},
-    ]
-  },
-  {
-    title:'The Stolen Bread',
-    text:'You catch a child stealing bread from a market stall. The merchant hasn\'t noticed. The child is clearly starving, eyes wide with fear.',
-    choices:[
-      {type:'righteous', label:'Pay for the bread and let the child go', effect:+12, desc:'You quietly settle the debt and watch the child run, bread in hand.'},
-      {type:'neutral',   label:'Return the bread and scold the child',   effect:+2,  desc:'The child goes hungry but learns a lesson.'},
-      {type:'sinful',    label:'Report the child to the merchant',       effect:-11, desc:'The merchant\'s punishment is disproportionate and cruel.'},
-    ]
-  },
-];
 
 // ──────────────────────────────────────────
-// STORY MISSIONS (3 locations)
+// CHARACTER-SPECIFIC ACTS (15 per character)
 // ──────────────────────────────────────────
-const STORY_MISSIONS = [
+const CHARACTER_ACTS = {
+peter: [
+  {
+    title:'The Threatened Catch',
+    text:'Two rival fishermen claim your boat slip at the Galilee docks, threatening to damage your nets if you don\'t leave. Your livelihood is at stake.',
+    choices:[
+      {type:'righteous', label:'Offer to share the slip', effect:+13, desc:'You propose a schedule. The rivals are disarmed by the unexpected generosity.'},
+      {type:'neutral',   label:'Quietly find another spot', effect:+3, desc:'You move without conflict, but say nothing to help those who come after.'},
+      {type:'sinful',    label:'Shove back and claim your ground', effect:-11, desc:'The confrontation escalates. Someone\'s net is torn.'},
+    ]
+  },
+  {
+    title:'The Sword at Your Side',
+    text:'A Zealot pulls you aside in the market. "Simon, you have a sword and a strong arm. Join us — drive the Romans out. Isn\'t that what God wants?"',
+    choices:[
+      {type:'righteous', label:'Decline and speak of peace', effect:+14, desc:'"My master\'s kingdom is not of this world," you say firmly.'},
+      {type:'neutral',   label:'Deflect without committing', effect:+3,  desc:'You give no answer, leaving him unsatisfied.'},
+      {type:'sinful',    label:'Accept their invitation',    effect:-16, desc:'You let bitterness toward Rome drown out your better judgment.'},
+    ]
+  },
+  {
+    title:'Market Brawl',
+    text:'You see a Roman soldier strike an elderly Jewish man who accidentally bumped into him. The old man falls. The soldier raises his hand again.',
+    choices:[
+      {type:'righteous', label:'Step between them calmly', effect:+16, desc:'You plant yourself firmly, look the soldier in the eye. He backs down.'},
+      {type:'neutral',   label:'Call witnesses loudly',    effect:+5,  desc:'The attention slows the soldier, but the old man is already hurt.'},
+      {type:'sinful',    label:'Draw your blade in anger', effect:-15, desc:'The situation spirals. Others are caught in the conflict.'},
+    ]
+  },
+  {
+    title:'The Galilean Accent',
+    text:'In a synagogue far from home, people snicker at your thick northern accent when you read the scripture aloud. A scribe whispers, "Galileans have no theology."',
+    choices:[
+      {type:'righteous', label:'Read boldly and finish with grace', effect:+12, desc:'You speak louder, calmly, and those who mocked fall quiet.'},
+      {type:'neutral',   label:'Rush through and sit down',         effect:+2,  desc:'You survive the humiliation but say nothing.'},
+      {type:'sinful',    label:'Curse the scribe under your breath', effect:-9, desc:'The seed of resentment takes root.'},
+    ]
+  },
+  {
+    title:'Empty Pulpit',
+    text:'The teacher expected to lead Sabbath prayers is drunk in a back room. The congregation waits awkwardly. Someone points at you.',
+    choices:[
+      {type:'righteous', label:'Step up and lead the prayers', effect:+14, desc:'Rough and unpolished, but sincere — the congregation is moved.'},
+      {type:'neutral',   label:'Find someone more educated',   effect:+3,  desc:'The service happens, delayed and cold.'},
+      {type:'sinful',    label:'Expose the drunk teacher',     effect:-12, desc:'The congregation is scandalized and the man shamed publicly.'},
+    ]
+  },
+  {
+    title:'The Gold Offer',
+    text:'A wealthy merchant offers you a bag of gold — enough to buy a fleet of boats — in exchange for a private word with Jesus. He wants a miracle for his business.',
+    choices:[
+      {type:'righteous', label:'Refuse and rebuke the offer', effect:+15, desc:'"The Kingdom of God is not for sale," you tell him plainly.'},
+      {type:'neutral',   label:'Tell him you\'ll pass the request along', effect:+2, desc:'You give him false hope and keep the awkward peace.'},
+      {type:'sinful',    label:'Pocket a small "finder\'s fee"', effect:-18, desc:'The gold feels heavy the moment you close your fist around it.'},
+    ]
+  },
+  {
+    title:'Ruined Nets',
+    text:'Someone has slashed your fishing nets overnight — clearly deliberate. Your brother Andrew suspects a rival. You know who likely did it.',
+    choices:[
+      {type:'righteous', label:'Confront them honestly and forgive', effect:+13, desc:'The man breaks down. He was desperate. You repair the nets together.'},
+      {type:'neutral',   label:'Repair the nets and say nothing',    effect:+3,  desc:'You swallow the injustice. It festers quietly.'},
+      {type:'sinful',    label:'Retaliate in kind',                  effect:-14, desc:'The cycle of damage continues. The harbor is now divided.'},
+    ]
+  },
+  {
+    title:'The Roman\'s Question',
+    text:'A Roman centurion stops you at the road\'s edge. "You travel with the teacher from Nazareth. Tell me — is it true he healed a servant without being there?" His tone is genuine.',
+    choices:[
+      {type:'righteous', label:'Tell him everything you witnessed', effect:+14, desc:'He listens intently, then says quietly: "I believe it."'},
+      {type:'neutral',   label:'Give a short, guarded answer',      effect:+3,  desc:'You don\'t lie, but you don\'t open a door either.'},
+      {type:'sinful',    label:'Deny you know the teacher',         effect:-16, desc:'The word slips out easily. That frightens you more than anything.'},
+    ]
+  },
+  {
+    title:'Stolen Coin',
+    text:'You find a denarius on the ground near your boat. A young boy is frantically searching nearby. It must be his — but no one saw you pick it up.',
+    choices:[
+      {type:'righteous', label:'Return it to the boy at once', effect:+10, desc:'His face floods with relief. "My mother sent me for bread," he says.'},
+      {type:'neutral',   label:'Ask around to confirm it\'s his', effect:+4, desc:'You do the right thing, slowly.'},
+      {type:'sinful',    label:'Keep it — finders keepers',     effect:-10, desc:'You spend it before sundown. The boy\'s face stays with you.'},
+    ]
+  },
+  {
+    title:'The Zealot\'s Call',
+    text:'A group of zealots block the road. Their leader is a man you fished beside for years. "Simon, last chance. Our movement needs you. Or are you a coward now?"',
+    choices:[
+      {type:'righteous', label:'Refuse clearly and offer peace instead', effect:+15, desc:'His eyes harden, but you hold his gaze. Some in his group look thoughtful.'},
+      {type:'neutral',   label:'Walk around them in silence',            effect:+3,  desc:'You avoid the confrontation without endorsing their cause.'},
+      {type:'sinful',    label:'Join the march briefly to avoid shame',  effect:-13, desc:'You tell yourself it\'s just one march. It never is.'},
+    ]
+  },
+  {
+    title:'Brother\'s Challenge',
+    text:'Your brother Andrew tells you privately that he thinks you\'ve been boasting about your closeness to Jesus. "You make the others feel like outsiders, Simon."',
+    choices:[
+      {type:'righteous', label:'Receive the correction with humility', effect:+13, desc:'"You\'re right," you say, after a long silence. "I\'ll do better."'},
+      {type:'neutral',   label:'Defend yourself but hear him out',     effect:+4,  desc:'You argue, then soften — but nothing truly changes.'},
+      {type:'sinful',    label:'Dismiss it and change the subject',    effect:-11, desc:'The wound between you closes over without healing.'},
+    ]
+  },
+  {
+    title:'Desperate Healing',
+    text:'A woman has pushed through the crowd and grabbed your cloak — not Jesus\', yours. "Please, I\'ve been sick twelve years. I thought maybe even one of his followers..."',
+    choices:[
+      {type:'righteous', label:'Pray with her sincerely and at length', effect:+16, desc:'You kneel right there in the road and pour your heart out. She weeps with gratitude.'},
+      {type:'neutral',   label:'Redirect her toward Jesus kindly',     effect:+5,  desc:'You point her in the right direction. She finds her healing.'},
+      {type:'sinful',    label:'Tell her you don\'t have that power',  effect:-12, desc:'Technically true — but your dismissal crushes her.'},
+    ]
+  },
+  {
+    title:'Widow\'s Property',
+    text:'A legal dispute: a powerful landowner is claiming a widow\'s property using a technicality. He asks you, as a known follower of the teacher, to witness the transaction as legitimate.',
+    choices:[
+      {type:'righteous', label:'Refuse to witness and expose the scheme', effect:+17, desc:'The landowner threatens you. You stand firm. The widow keeps her land.'},
+      {type:'neutral',   label:'Decline without making a scene',           effect:+4,  desc:'He finds another witness. The widow still loses, but not by your hand.'},
+      {type:'sinful',    label:'Sign the document for a payment',          effect:-19, desc:'The widow is evicted. The silver sits in your pouch like a stone.'},
+    ]
+  },
+  {
+    title:'Imposter\'s Claim',
+    text:'A man in the market is claiming to be a disciple of Jesus — using the name to gather donations. He waves at you. You\'ve never seen him before.',
+    choices:[
+      {type:'righteous', label:'Call him out publicly and clearly', effect:+14, desc:'He flees before you finish speaking. The crowd recovers its coins.'},
+      {type:'neutral',   label:'Confront him privately first',      effect:+5,  desc:'He denies it, but quiets down. Some are still deceived.'},
+      {type:'sinful',    label:'Let it go — it\'s not your problem', effect:-10, desc:'He collects far more before the day is over.'},
+    ]
+  },
+  {
+    title:'Empty Tomb Report',
+    text:'You\'ve rushed back from the tomb, heart pounding. The women say He is risen. The other disciples look to you. Your word carries enormous weight in this moment.',
+    choices:[
+      {type:'righteous', label:'Declare what you saw with full conviction', effect:+20, desc:'"The linen was folded. He is not there." Your certainty steadies the room.'},
+      {type:'neutral',   label:'Describe the facts without interpretation', effect:+6,  desc:'You report carefully. Others will have to draw their own conclusions.'},
+      {type:'sinful',    label:'Admit you\'re too afraid to believe it',    effect:-15, desc:'The room deflates. Your doubt becomes a wall between them and hope.'},
+    ]
+  },
+],
+john: [
+  {
+    title:'Elder\'s Last Words',
+    text:'An elderly rabbi is dying in a home you pass. His family asks if anyone can stay and record his final teachings. You have plans, but he is asking for you specifically.',
+    choices:[
+      {type:'righteous', label:'Stay and listen through the night', effect:+14, desc:'You fill a scroll with his words. His family weeps with gratitude.'},
+      {type:'neutral',   label:'Stay for one hour then leave',      effect:+4,  desc:'You catch some of his words. His eyes follow you to the door.'},
+      {type:'sinful',    label:'Send your regards and move on',     effect:-10, desc:'He dies before sundown. No one recorded his final words.'},
+    ]
+  },
+  {
+    title:'Disciples\' Argument',
+    text:'Two disciples argue loudly at dinner about who sits closest to Jesus tomorrow. The argument is getting personal. Everyone is watching.',
+    choices:[
+      {type:'righteous', label:'Gently mediate and restore peace', effect:+13, desc:'"The greatest among you shall be your servant." They both fall quiet.'},
+      {type:'neutral',   label:'Sit between them and change the topic', effect:+4, desc:'The tension eases but the root issue is untouched.'},
+      {type:'sinful',    label:'Take a side to end the argument faster', effect:-11, desc:'You end the argument but begin a different one.'},
+    ]
+  },
+  {
+    title:'Temple Steps',
+    text:'A young man approaches you on the temple steps. "I have been reading the prophets for years, but no one will teach me. The rabbis say I\'m too old to begin studying."',
+    choices:[
+      {type:'righteous', label:'Sit down and teach him right there', effect:+15, desc:'Two hours pass. The young man won\'t stop asking questions.'},
+      {type:'neutral',   label:'Point him toward a good teacher',    effect:+5,  desc:'You help, but from a distance.'},
+      {type:'sinful',    label:'Agree the rabbis are probably right', effect:-13, desc:'You extinguish a flame that was just beginning to burn.'},
+    ]
+  },
+  {
+    title:'Revealed Deception',
+    text:'You discover that a fellow disciple has been skimming from the shared purse — small amounts, regularly. You haven\'t told Jesus. You aren\'t sure what to do.',
+    choices:[
+      {type:'righteous', label:'Bring it to Jesus honestly', effect:+16, desc:'The conversation is painful. But it is the truth, spoken in love.'},
+      {type:'neutral',   label:'Confront the disciple privately first', effect:+5, desc:'He denies it. You let it go for now.'},
+      {type:'sinful',    label:'Say nothing to keep the peace',         effect:-14, desc:'The theft continues. So does your silence.'},
+    ]
+  },
+  {
+    title:'Gentile Child',
+    text:'A Gentile woman\'s child is blocking the path to the synagogue, playing in the dust. Some disciples push past with irritation. The child looks up at you.',
+    choices:[
+      {type:'righteous', label:'Kneel and speak kindly to the child', effect:+11, desc:'The child laughs. The mother watches from a doorway, eyes softening.'},
+      {type:'neutral',   label:'Step around carefully',               effect:+2,  desc:'You don\'t harm the child, but you don\'t see her either.'},
+      {type:'sinful',    label:'Shoo the child out of the way',       effect:-10, desc:'The child scurries off frightened. You feel nothing — which is the problem.'},
+    ]
+  },
+  {
+    title:'The Roman\'s Questions',
+    text:'A Roman soldier approaches you alone near the well — not threatening, but genuinely curious. "What does your teacher mean by \'living water\'? I heard him speak it once."',
+    choices:[
+      {type:'righteous', label:'Sit with him and explain at length', effect:+14, desc:'You speak for an hour. He asks more questions than you can answer.'},
+      {type:'neutral',   label:'Give a short theological summary',   effect:+4,  desc:'He nods politely. You\'re not sure how much reached him.'},
+      {type:'sinful',    label:'Refuse to speak with a Roman',       effect:-12, desc:'You walk away. The question dies unanswered.'},
+    ]
+  },
+  {
+    title:'The Wealthy Patroness',
+    text:'A wealthy woman offers to fund your ministry — boats, lodging, provisions — in exchange for a public endorsement of her family\'s reputation in the synagogue.',
+    choices:[
+      {type:'righteous', label:'Decline the arrangement as given',    effect:+13, desc:'You explain why. She is quiet — then later gives freely, with no strings.'},
+      {type:'neutral',   label:'Take the support and say little',     effect:+3,  desc:'The provisions come. The arrangement feels uneasy.'},
+      {type:'sinful',    label:'Publicly praise her family at market', effect:-15, desc:'The endorsement flows easily. Truth becomes currency.'},
+    ]
+  },
+  {
+    title:'Hidden Letter',
+    text:'You find a letter dropped in the road. It is addressed to the High Priest, and through a torn seal you can read — it contains a plot against Jesus.',
+    choices:[
+      {type:'righteous', label:'Bring the letter directly to Jesus', effect:+18, desc:'He reads it slowly, folds it, and says: "It is as it must be." But you told him.'},
+      {type:'neutral',   label:'Confront the letter\'s sender',      effect:+6,  desc:'He denies it. You can\'t prove anything.'},
+      {type:'sinful',    label:'Use it as leverage for safety',      effect:-16, desc:'You bargain with it. The letter changes hands for all the wrong reasons.'},
+    ]
+  },
+  {
+    title:'Scholar\'s Challenge',
+    text:'A Temple scholar publicly challenges you in front of a crowd: "You are a fisherman. What authority do you have to speak about the Torah? Name your teacher\'s credentials."',
+    choices:[
+      {type:'righteous', label:'Answer humbly and boldly at once', effect:+14, desc:'"I speak what I have seen with my own eyes." The crowd leans in.'},
+      {type:'neutral',   label:'Deflect with a question of your own', effect:+4, desc:'The exchange ends in a draw. No one is convinced.'},
+      {type:'sinful',    label:'Mock his robes and walk away',        effect:-12, desc:'The crowd laughs — but you\'ve closed a mind that might have opened.'},
+    ]
+  },
+  {
+    title:'Dying Roadside',
+    text:'A traveler has collapsed at the roadside, burning with fever. He is Samaritan. You are already late to meet the others.',
+    choices:[
+      {type:'righteous', label:'Stop and care for him fully', effect:+17, desc:'You spend the afternoon finding him shelter and water. You arrive late.'},
+      {type:'neutral',   label:'Drag him to shade and send word', effect:+5, desc:'He is safer. Whether anyone comes — you don\'t know.'},
+      {type:'sinful',    label:'Tell yourself someone will come', effect:-14, desc:'You pass. You look back once. The road is still empty.'},
+    ]
+  },
+  {
+    title:'Doubting Young Man',
+    text:'A young believer tells you privately: "I no longer believe. I saw a child die of illness despite our prayers. How can your God be good?" He is waiting for an answer.',
+    choices:[
+      {type:'righteous', label:'Sit with him in the grief before speaking', effect:+16, desc:'You say nothing for a long time. Then you tell him of Lazarus. He weeps.'},
+      {type:'neutral',   label:'Offer the standard explanations',           effect:+4,  desc:'He listens politely. He is not helped.'},
+      {type:'sinful',    label:'Tell him his faith was too small',          effect:-13, desc:'The wound you leave is worse than the one you found.'},
+    ]
+  },
+  {
+    title:'Excluded Woman',
+    text:'The synagogue leader has turned away a woman who traveled from afar to hear the teaching. "Women learn at home," he says. She stands at the door.',
+    choices:[
+      {type:'righteous', label:'Invite her in and challenge the ruling', effect:+15, desc:'The argument is uncomfortable. The woman hears every word of the teaching.'},
+      {type:'neutral',   label:'Tell her what was taught afterward',     effect:+5,  desc:'She receives the teaching secondhand.'},
+      {type:'sinful',    label:'Support the synagogue leader\'s rule',   effect:-13, desc:'Tradition, not love, has won the day.'},
+    ]
+  },
+  {
+    title:'Pressured Baptism',
+    text:'A powerful elder demands you baptize his adult son — who clearly doesn\'t want to be there. The son\'s eyes say it all. The father\'s money has funded your travels.',
+    choices:[
+      {type:'righteous', label:'Refuse until the son chooses freely', effect:+14, desc:'The elder fumes. The son looks at you with something like relief.'},
+      {type:'neutral',   label:'Conduct a ceremony, brief and hollow', effect:+2, desc:'Everyone goes through the motions.'},
+      {type:'sinful',    label:'Baptize him to keep the peace',        effect:-15, desc:'The water means nothing. And the son knows it.'},
+    ]
+  },
+  {
+    title:'Leper\'s Request',
+    text:'A leper calls to you — not for healing, but for a letter of testimony. "Will you write that you have spoken with me? That I am a person? I need it for the city gate."',
+    choices:[
+      {type:'righteous', label:'Write the letter fully and sign your name', effect:+13, desc:'You use your best ink. He holds the letter like something sacred.'},
+      {type:'neutral',   label:'Write something brief and unsigned',        effect:+4,  desc:'It may help. It isn\'t much.'},
+      {type:'sinful',    label:'Refuse — it could cause you trouble',       effect:-11, desc:'You protect your reputation. He remains nameless at the gate.'},
+    ]
+  },
+  {
+    title:'Dismissed Testimony',
+    text:'You tell the other disciples what you witnessed — a blind man receiving sight, the mud still on his face. Two of them say: "John always exaggerates." They laugh.',
+    choices:[
+      {type:'righteous', label:'Repeat it calmly and with full detail', effect:+12, desc:'You describe everything you saw. You refuse to shrink from what was real.'},
+      {type:'neutral',   label:'Let the moment pass quietly',           effect:+2,  desc:'They will believe or not. That is not in your hands.'},
+      {type:'sinful',    label:'Agree to soften it — "Maybe it wasn\'t as clear..."', effect:-12, desc:'You compromise what you saw to belong. The truth loses ground.'},
+    ]
+  },
+],
+james: [
+  {
+    title:'Seat of Honor',
+    text:'At a Pharisee\'s dinner, the host gestures to the seat of honor and says, "Please, you are a disciple of the teacher — sit here." Other guests are watching.',
+    choices:[
+      {type:'righteous', label:'Take a lower seat humbly',             effect:+13, desc:'"Let the host place me where I belong," you say. The room notices.'},
+      {type:'neutral',   label:'Accept graciously without fanfare',    effect:+3,  desc:'You sit. It means nothing to you. Or so you tell yourself.'},
+      {type:'sinful',    label:'Accept with visible pride and settle in', effect:-12, desc:'Your robe spreads wide. You haven\'t thought about the servants.'},
+    ]
+  },
+  {
+    title:'Rejected Village',
+    text:'A Samaritan village refuses your group lodging for the night. You turn to your brother John, both of you thinking the same thing: "Should we call down fire?"',
+    choices:[
+      {type:'righteous', label:'Move on peacefully and forgive', effect:+14, desc:'Jesus had already moved on. You catch up, still fuming — but you let it go.'},
+      {type:'neutral',   label:'Leave in silence without comment', effect:+4, desc:'The village is left unharmed. Your pride is still bruised.'},
+      {type:'sinful',    label:'Curse the village in your anger', effect:-15, desc:'The words leave your mouth before wisdom does.'},
+    ]
+  },
+  {
+    title:'Public Debate',
+    text:'A scribe challenges you to a debate at the city gate, drawing a crowd. He is sharper and more educated. You know the truth but lack his vocabulary.',
+    choices:[
+      {type:'righteous', label:'Speak plainly from what you\'ve witnessed', effect:+14, desc:'The crowd doesn\'t care about vocabulary. They care about truth.'},
+      {type:'neutral',   label:'Argue until you\'re outmaneuvered, then stop', effect:+3, desc:'You fight to a draw and exit with dignity.'},
+      {type:'sinful',    label:'Attack his character instead of his argument', effect:-12, desc:'The crowd turns. Mud-slinging never wins the honest ones.'},
+    ]
+  },
+  {
+    title:'Zealot\'s Offer',
+    text:'A zealot recruiter tells you: "Son of Thunder — that\'s what they call you. Men with fire in their belly are exactly what the resistance needs. Name your price."',
+    choices:[
+      {type:'righteous', label:'Declare your allegiance to a different kingdom', effect:+15, desc:'"I serve a king you have not imagined," you tell him flatly.'},
+      {type:'neutral',   label:'Decline without explaining why',                  effect:+3,  desc:'He walks away unconvinced of your reasoning.'},
+      {type:'sinful',    label:'Ask what the compensation looks like',            effect:-14, desc:'The question itself has already cost you something.'},
+    ]
+  },
+  {
+    title:'Leadership Offer',
+    text:'The leader of a synagogue delegation approaches you privately. "We want a disciple to serve as our liaison to Jesus. It would be a prestigious role. We\'d pay well."',
+    choices:[
+      {type:'righteous', label:'Decline — you answer to Jesus alone', effect:+13, desc:'"I am not for sale as a go-between," you say clearly.'},
+      {type:'neutral',   label:'Say you\'ll think about it',           effect:+3,  desc:'You won\'t. But the hesitation itself is revealing.'},
+      {type:'sinful',    label:'Accept the role and the payment',      effect:-16, desc:'The title feels good for about a day.'},
+    ]
+  },
+  {
+    title:'Transfiguration\'s Secret',
+    text:'Jesus commanded you, Peter, and John to tell no one what you witnessed on the mountain. But a close friend is asking you directly and earnestly to share it.',
+    choices:[
+      {type:'righteous', label:'Keep the secret as commanded', effect:+15, desc:'"I cannot speak of it yet," you say, and mean it.'},
+      {type:'neutral',   label:'Give a vague hint to satisfy them', effect:+2, desc:'You haven\'t lied — but you haven\'t obeyed either.'},
+      {type:'sinful',    label:'Tell them everything in hushed tones', effect:-13, desc:'The secret unravels. You tell yourself it won\'t matter. It does.'},
+    ]
+  },
+  {
+    title:'Centurion\'s Blessing',
+    text:'A Roman centurion whose servant was healed by Jesus approaches you to say thank you and asks: "How can I support your ministry?" He seems genuinely changed.',
+    choices:[
+      {type:'righteous', label:'Receive him warmly and give him direction', effect:+14, desc:'You tell him how to give without taking credit.'},
+      {type:'neutral',   label:'Accept the thanks and walk on',             effect:+3,  desc:'A lost opportunity, but no harm done.'},
+      {type:'sinful',    label:'Take his donation for personal use',        effect:-17, desc:'You call it ministry expenses. Your conscience calls it something else.'},
+    ]
+  },
+  {
+    title:'Mother\'s Ambition',
+    text:'Your mother, Salome, has gone ahead and asked Jesus to seat you and John at his right and left in the kingdom. The other disciples are furious. Everyone is looking at you.',
+    choices:[
+      {type:'righteous', label:'Apologize on behalf of your family publicly', effect:+16, desc:'The tension breaks. You stand smaller in the best possible way.'},
+      {type:'neutral',   label:'Stay out of it and let Jesus handle it',      effect:+5,  desc:'The moment passes. The resentment doesn\'t fully.'},
+      {type:'sinful',    label:'Quietly hope he says yes anyway',             effect:-14, desc:'You say nothing — but the ambition has already spoken.'},
+    ]
+  },
+  {
+    title:'Rival Preacher',
+    text:'You discover a man preaching in Jesus\' name who isn\'t part of your group — and his crowds are larger than yours. You don\'t recognize him.',
+    choices:[
+      {type:'righteous', label:'Observe him and wish him well', effect:+12, desc:'"Whoever is not against us is for us." You let it go.'},
+      {type:'neutral',   label:'Report him to the group for a decision', effect:+4, desc:'It becomes a committee matter. Nothing changes.'},
+      {type:'sinful',    label:'Try to have him run out of town',         effect:-14, desc:'Your turf instinct has gotten the better of your theology.'},
+    ]
+  },
+  {
+    title:'Exclusive Intelligence',
+    text:'You overhear Pharisees planning to trap Jesus with a question about Roman taxes. You could warn him — or you could hold the information to appear indispensable.',
+    choices:[
+      {type:'righteous', label:'Warn Jesus immediately and completely', effect:+15, desc:'He listens, nods. "They will ask. And I will answer."'},
+      {type:'neutral',   label:'Mention it casually at the next meal', effect:+4,  desc:'It helps, but the timing was yours to control.'},
+      {type:'sinful',    label:'Drop it as a whisper just before the moment', effect:-11, desc:'You engineered the drama. You\'re not sure why.'},
+    ]
+  },
+  {
+    title:'Gathering Mob',
+    text:'A crowd is forming around a woman accused of adultery. Stones are appearing in hands. You have enough authority here to stop this if you speak now.',
+    choices:[
+      {type:'righteous', label:'Step in front of the crowd and speak', effect:+18, desc:'"Let him who is without sin..." The stones lower, one by one.'},
+      {type:'neutral',   label:'Find a religious leader to intervene', effect:+5,  desc:'The leader comes — eventually. The moment is tense.'},
+      {type:'sinful',    label:'Decide it\'s none of your business',   effect:-16, desc:'You turn away at the moment your voice mattered most.'},
+    ]
+  },
+  {
+    title:'Challenge of Wisdom',
+    text:'A philosopher from Greece asks you to explain why following one teacher is superior to following the great philosophers of Athens. The crowd is educated and skeptical.',
+    choices:[
+      {type:'righteous', label:'Answer humbly from personal witness', effect:+13, desc:'"I cannot match your arguments. I can only tell you what I saw."'},
+      {type:'neutral',   label:'Give an intellectual defense and withdraw', effect:+4, desc:'You hold your ground but convert no one.'},
+      {type:'sinful',    label:'Dismiss Greek thought as worthless',        effect:-11, desc:'Your pride in Jewish tradition has become its own form of blindness.'},
+    ]
+  },
+  {
+    title:'Public Accusation',
+    text:'Someone shouts at you in the marketplace: "Son of Thunder! You called for fire on a village! What kind of disciple does that?" Several bystanders stop to listen.',
+    choices:[
+      {type:'righteous', label:'Admit the fault openly', effect:+14, desc:'"I was wrong that day," you say clearly. "I have been learning what it means to follow."'},
+      {type:'neutral',   label:'Explain the context defensively', effect:+3, desc:'You justify enough to escape the moment.'},
+      {type:'sinful',    label:'Deny it ever happened',           effect:-13, desc:'The lie stiffens something in your face. The crowd sees it.'},
+    ]
+  },
+  {
+    title:'Unauthorized Healer',
+    text:'You find a man using Jesus\' name to pray over the sick — and it appears to be working. But he has no connection to your group at all.',
+    choices:[
+      {type:'righteous', label:'Rejoice and encourage him', effect:+13, desc:'"The Spirit goes where it will," you say. The man\'s eyes fill.'},
+      {type:'neutral',   label:'Report it to Jesus without judgment', effect:+5, desc:'You let the teacher decide.'},
+      {type:'sinful',    label:'Forbid him sharply',                  effect:-12, desc:'Jesus will later correct you on this very point.'},
+    ]
+  },
+  {
+    title:'Final Pride Test',
+    text:'Jesus washes all the disciples\' feet, one by one. He is coming toward you now. You feel deeply uncomfortable — this is beneath him. You want to protest.',
+    choices:[
+      {type:'righteous', label:'Receive it with stillness and gratitude', effect:+16, desc:'The act breaks something open in you. You understand power differently now.'},
+      {type:'neutral',   label:'Submit quietly but without understanding', effect:+4, desc:'You let him do it. The meaning escapes you for now.'},
+      {type:'sinful',    label:'Insist he skip you — it\'s too uncomfortable', effect:-14, desc:'"Then you have no part with me," he says softly.'},
+    ]
+  },
+],
+mary: [
+  {
+    title:'Kitchen vs. Teacher',
+    text:'You are helping prepare a meal when you realize you\'ve missed half of the teaching being given just one room away. You can hear every word. The food still needs finishing.',
+    choices:[
+      {type:'righteous', label:'Set down the work and listen', effect:+14, desc:'The meal is late. The teaching fills you completely. One will feed the body. One the soul.'},
+      {type:'neutral',   label:'Try to do both at the same time', effect:+3, desc:'You catch fragments. You miss more than you think.'},
+      {type:'sinful',    label:'Resent those who get to sit and listen', effect:-11, desc:'The bitterness flavors the bread.'},
+    ]
+  },
+  {
+    title:'Woman Caught',
+    text:'A crowd is dragging a woman through the street toward the temple. Stones have already been gathered. You are close enough to step forward before it goes further.',
+    choices:[
+      {type:'righteous', label:'Plant yourself in her path and stand firm', effect:+18, desc:'They stop, surprised. You look each man in the eye. The crowd breaks.'},
+      {type:'neutral',   label:'Run for a teacher or authority figure',     effect:+5,  desc:'Help comes — barely in time.'},
+      {type:'sinful',    label:'Turn away to avoid the trouble',            effect:-15, desc:'The sound of the crowd fades behind you.'},
+    ]
+  },
+  {
+    title:'Expensive Gift',
+    text:'You have an alabaster jar of spikenard — a full year\'s wages. It was your security. Now, standing before Jesus, something in you says: give it all.',
+    choices:[
+      {type:'righteous', label:'Break the jar and anoint him fully', effect:+20, desc:'The fragrance fills the room. Some gasp. Others are angry. You feel only peace.'},
+      {type:'neutral',   label:'Offer a small portion and keep the rest', effect:+5, desc:'Something is given. Something is withheld.'},
+      {type:'sinful',    label:'Keep it — you need the security',          effect:-14, desc:'The moment passes. The jar stays sealed. You carry its weight for a long time.'},
+    ]
+  },
+  {
+    title:'Lost Child',
+    text:'A child has been separated from her family in the crowd around Jesus. She is weeping. No one around you seems to notice or care.',
+    choices:[
+      {type:'righteous', label:'Take the child\'s hand and search together', effect:+13, desc:'An hour later, you find the mother. The reunion undoes you both.'},
+      {type:'neutral',   label:'Tell a nearby adult and point them toward her', effect:+4, desc:'Someone eventually helps.'},
+      {type:'sinful',    label:'Assume someone else will handle it',             effect:-10, desc:'The child is still weeping when you lose sight of her.'},
+    ]
+  },
+  {
+    title:'Pharisee\'s Insult',
+    text:'You enter a man\'s house as part of Jesus\' company. The host leans to a neighbor and says quietly, but within earshot: "Who let the woman in with the disciples?"',
+    choices:[
+      {type:'righteous', label:'Address him directly and gracefully', effect:+14, desc:'You face him. "I follow where truth leads me, friend." He doesn\'t know what to say.'},
+      {type:'neutral',   label:'Let it pass — it isn\'t worth it',    effect:+3,  desc:'You stay. The insult stays too.'},
+      {type:'sinful',    label:'Leave rather than endure it',         effect:-11, desc:'The table loses a witness it needed.'},
+    ]
+  },
+  {
+    title:'Midnight Vigil',
+    text:'One of the disciples is keeping a private prayer vigil and asks you to stand watch. It is long past midnight. You are exhausted. You begin to drift toward sleep.',
+    choices:[
+      {type:'righteous', label:'Rouse yourself and stay awake fully', effect:+12, desc:'By the third hour you are more awake than you\'ve been in months.'},
+      {type:'neutral',   label:'Sleep lightly, waking every hour',   effect:+3,  desc:'You are there, but barely.'},
+      {type:'sinful',    label:'Fall asleep — you\'ll explain later', effect:-10, desc:'"Could you not watch with me one hour?" The question will echo.'},
+    ]
+  },
+  {
+    title:'Wealthy Convert',
+    text:'A wealthy woman from a prominent family seeks you out privately. "I want to believe. But if I follow this teacher openly, my family will disown me." She is asking for advice.',
+    choices:[
+      {type:'righteous', label:'Tell her your own story honestly', effect:+15, desc:'You speak for an hour. By the end, she is weeping and resolved.'},
+      {type:'neutral',   label:'Encourage her and give general counsel', effect:+5, desc:'She leaves encouraged but uncommitted.'},
+      {type:'sinful',    label:'Suggest she follow quietly and keep the money', effect:-13, desc:'You\'ve made faith into a thing that can be hidden.'},
+    ]
+  },
+  {
+    title:'Sabbath Dilemma',
+    text:'On the Sabbath, a neighbor\'s elderly mother has fallen and cannot rise. The strictest interpreters say healing work is forbidden. She is in pain.',
+    choices:[
+      {type:'righteous', label:'Help her up immediately — mercy over rule', effect:+14, desc:'You lift her gently. "The Sabbath was made for people," you say. She thanks you.'},
+      {type:'neutral',   label:'Wait for a male household member to decide', effect:+3,  desc:'Help comes eventually.'},
+      {type:'sinful',    label:'Invoke the Sabbath law and leave her',       effect:-14, desc:'The law becomes a cage instead of a gift.'},
+    ]
+  },
+  {
+    title:'Missed Teaching',
+    text:'You fell asleep during an outdoor teaching — exhausted from the morning\'s work. You woke just as it ended. A disciple asks you what you thought of the key point.',
+    choices:[
+      {type:'righteous', label:'Admit you fell asleep and ask to hear it again', effect:+11, desc:'The disciple laughs and retells it all. You don\'t miss a word this time.'},
+      {type:'neutral',   label:'Nod and give a vague answer',                    effect:+2,  desc:'You get by. And miss the chance to learn.'},
+      {type:'sinful',    label:'Fabricate an opinion on a teaching you didn\'t hear', effect:-10, desc:'Smaller lies lead to larger ones.'},
+    ]
+  },
+  {
+    title:'Grieving Mother',
+    text:'A woman you know has just lost her only son. Her neighbors are giving her advice and trying to explain why God allowed it. She is not saying a word — just staring.',
+    choices:[
+      {type:'righteous', label:'Sit beside her without speaking', effect:+15, desc:'You stay for three hours. When you finally leave, she says it was the only thing that helped.'},
+      {type:'neutral',   label:'Offer practical help and a prayer', effect:+5,  desc:'Something useful is done.'},
+      {type:'sinful',    label:'Offer theological explanations like the others', effect:-12, desc:'Your words sound hollow even to yourself.'},
+    ]
+  },
+  {
+    title:'Limited Medicine',
+    text:'You have a small supply of healing herbs — enough for one person. Two people need them urgently: a child with fever, and an elderly teacher who has instructed many.',
+    choices:[
+      {type:'righteous', label:'Give it all to the child', effect:+14, desc:'The teacher understands. "Do not mourn for me," he says gently.'},
+      {type:'neutral',   label:'Divide it equally between them', effect:+5, desc:'Neither receives a full dose. Both survive, barely.'},
+      {type:'sinful',    label:'Give it to the teacher — greater impact', effect:-12, desc:'The child\'s fever worsens through the night.'},
+    ]
+  },
+  {
+    title:'Dismissed Observation',
+    text:'You noticed something during the feeding of the crowd that no one else saw — a detail that changes how the miracle should be understood. You share it. The disciples laugh.',
+    choices:[
+      {type:'righteous', label:'Repeat it clearly and stand by it', effect:+13, desc:'"No — listen. I was there, I saw it." Slowly, they hear you.'},
+      {type:'neutral',   label:'Let it go — it\'s not worth the fight', effect:+2, desc:'The insight dies with the dismissal.'},
+      {type:'sinful',    label:'Agree that you probably misunderstood', effect:-11, desc:'You abandon what you know to be true.'},
+    ]
+  },
+  {
+    title:'Soldier\'s Kindness',
+    text:'A Roman soldier offers you a drink of water at a roadside well — genuinely, without motive, sharing his ration. The other women in your group look away uncomfortably.',
+    choices:[
+      {type:'righteous', label:'Accept with simple gratitude and a kind word', effect:+11, desc:'"Thank you, friend." He blinks. The word "friend" surprises him completely.'},
+      {type:'neutral',   label:'Accept quickly without acknowledgment',        effect:+2,  desc:'The gesture passes without meaning.'},
+      {type:'sinful',    label:'Refuse to accept anything from a Roman',       effect:-9,  desc:'His face closes. A small bridge is burned.'},
+    ]
+  },
+  {
+    title:'Security of Marriage',
+    text:'Your family is pressing you to accept a marriage arrangement that would guarantee security — a good man, a stable life. But your sense of calling pulls elsewhere.',
+    choices:[
+      {type:'righteous', label:'Speak your calling honestly to your family', effect:+14, desc:'The conversation is hard. They don\'t fully understand. But they hear you.'},
+      {type:'neutral',   label:'Ask for more time and delay the decision',   effect:+4,  desc:'The pressure eases but the question remains.'},
+      {type:'sinful',    label:'Accept to avoid the conflict',               effect:-13, desc:'You trade your calling for quiet. The quiet isn\'t peaceful.'},
+    ]
+  },
+  {
+    title:'Guarded Tomb',
+    text:'Roman guards have been placed at the tomb. You want to return at first light to complete the burial preparations. A friend urges you to stay away — "It\'s too dangerous."',
+    choices:[
+      {type:'righteous', label:'Go to the tomb at dawn regardless', effect:+18, desc:'You go. And what you find there — no fear could have kept you from being the first to know.'},
+      {type:'neutral',   label:'Wait and send someone else to check', effect:+5, desc:'The report comes second-hand.'},
+      {type:'sinful',    label:'Stay away — the risk isn\'t worth it', effect:-14, desc:'The first witness of the resurrection would have been you. You chose fear.'},
+    ]
+  },
+],
+};
+
+// ──────────────────────────────────────────
+// CHARACTER-SPECIFIC STORY MISSIONS
+// ──────────────────────────────────────────
+const CHARACTER_MISSIONS = {
+peter: [
   {
     location:'Galilee',
-    badge:'Story Mission I',
-    title:'The First Calling',
-    text:'You stand at the shore of Galilee, watching Jesus speak to the crowd from Simon Peter\'s boat. As the crowd disperses, He turns to you directly. "Follow me," He says, "and I will make you a fisher of men." Your old life — your nets, your plans, your certainties — lies behind you.',
+    badge:'Peter\'s Mission I',
+    title:'The Calling at the Shore',
+    text:'You have fished all night and caught nothing. Your nets hang empty in the dawn light. Jesus steps into your boat — your boat — and asks you to push out a little from shore. He teaches the crowd, then tells you to cast the nets into deep water. You are tired, salt-crusted, and skeptical. But something in his eyes.',
     choices:[
-      {type:'righteous', label:'Leave everything and follow',      effect:+25, desc:'"At once they left their nets and followed Him." Your spirit leaps with purpose.'},
-      {type:'neutral',   label:'Ask for a day to consider it',    effect:+8,  desc:'He nods and waits. But the moment of full surrender passes.'},
-      {type:'sinful',    label:'Explain you have responsibilities', effect:-20, desc:'"Let the dead bury their own dead." You have chosen comfort over calling.'},
+      {type:'righteous', label:'"Master, because you say so, I will let down the nets."', effect:+25, desc:'The nets fill so heavily they begin to tear. You fall to your knees: "Go away from me, Lord — I am a sinful man." He says: "Do not be afraid."'},
+      {type:'neutral',   label:'Obey without believing it will work', effect:+8, desc:'The catch astonishes you, but you hold the wonder at arm\'s length.'},
+      {type:'sinful',    label:'Refuse — you know these waters better', effect:-20, desc:'The boat returns empty again. The moment of calling closes like water over a stone.'},
     ],
     isMission:true
   },
   {
     location:'Capernaum',
-    badge:'Story Mission II',
-    title:'The Paralyzed Man',
-    text:'Four men cannot get their paralyzed friend through the door — the crowd is too thick. They climb to the roof and lower him through the tiles, desperate. Everyone watches Jesus. He looks at the man and says: "Your sins are forgiven." The Pharisees murmur. "Which is easier to say..." He turns to you.',
+    badge:'Peter\'s Mission II',
+    title:'Walking on Water',
+    text:'The boat is far from shore. The wind is against you. Then — a figure on the water, walking. The disciples cry out in terror. "It is a ghost!" But it speaks: "Take heart. It is I. Do not be afraid." You stand at the edge of the boat, heart hammering. "Lord, if it is you, command me to come to you on the water."',
     choices:[
-      {type:'righteous', label:'Declare faith openly before the Pharisees', effect:+25, desc:'You stand and speak. "This man is healed — I have witnessed it." The crowd stirs.'},
-      {type:'neutral',   label:'Watch in quiet awe and say nothing',        effect:+6,  desc:'The moment passes. Your faith remains private.'},
-      {type:'sinful',    label:'Side with the questioning Pharisees',       effect:-22, desc:'"How can this man forgive sins?" Your doubt becomes their weapon.'},
+      {type:'righteous', label:'Step out of the boat and walk toward him', effect:+25, desc:'For one breathtaking moment, the water holds you. Then the wind rises and fear floods in. You begin to sink — and a hand catches you. "You of little faith — why did you doubt?"'},
+      {type:'neutral',   label:'Wait in the boat until he comes to you', effect:+7, desc:'He enters the boat. The wind stops. The others worship. But you never stepped out.'},
+      {type:'sinful',    label:'Crouch down and say nothing', effect:-20, desc:'The figure draws near. You hide in the hull. The moment you could have walked on water passes.'},
     ],
     isMission:true
   },
   {
     location:'Jerusalem',
-    badge:'Story Mission III — Final',
-    title:'The Temple Courts',
-    text:'You enter the Temple and find it overrun — money changers, dove sellers, the stench of commerce in the house of God. Jesus overturns tables. In the chaos, the High Priest\'s guard approaches you: "Are you with this Galilean troublemaker?" Your answer will echo through history.',
+    badge:'Peter\'s Mission III — Final',
+    title:'The Rooster Crows',
+    text:'You swore you would never deny him. Not even if everyone else did. You are in the courtyard of the High Priest now, warming your hands at a fire. A servant girl looks at you closely: "You also were with Jesus of Galilee." The others around the fire begin to turn.',
     choices:[
-      {type:'righteous', label:'"Yes — and I am not ashamed of it."', effect:+30, desc:'Your voice rings out. Some in the crowd turn. You stand firm.'},
-      {type:'neutral',   label:'Slip away in the confusion',          effect:+5,  desc:'You escape unharmed, but the question haunts you.'},
-      {type:'sinful',    label:'"I do not know the man."',            effect:-25, desc:'The words of Peter\'s denial come from your own mouth.'},
+      {type:'righteous', label:'"I am. I am his disciple."', effect:+30, desc:'They seize you. It costs you everything. But when he is led past the courtyard, he looks at you — and you hold his gaze.'},
+      {type:'neutral',   label:'Deflect and change the subject', effect:+6, desc:'You are vague enough to survive the moment. The rooster crows. You feel the weight of what you did not say.'},
+      {type:'sinful',    label:'"I do not know the man."', effect:-25, desc:'The third time. The rooster crows. Jesus turns and looks at you — just looks at you. You go outside and weep bitterly.'},
     ],
     isMission:true
-  }
-];
+  },
+],
+john: [
+  {
+    location:'Galilee',
+    badge:'John\'s Mission I',
+    title:'The Mountain of Light',
+    text:'Jesus takes you, Peter, and James up a high mountain. You do not know why. Then, before your eyes — he is transfigured. His face shines like the sun. His clothes become white as light. Moses and Elijah appear beside him and speak with him. A voice from the cloud says: "This is my beloved Son. Listen to him." You fall on your face.',
+    choices:[
+      {type:'righteous', label:'Rise and let the vision change everything', effect:+25, desc:'When you lift your head, only Jesus remains. You walk down the mountain different.'},
+      {type:'neutral',   label:'Offer to build shelters for all three', effect:+7, desc:'The voice from the cloud cuts you off mid-sentence. You had wanted to do something. You needed only to listen.'},
+      {type:'sinful',    label:'Stay on the ground, overwhelmed and unable to rise', effect:-20, desc:'The moment passes above you. You experienced it, but you were not present to it.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Capernaum',
+    badge:'John\'s Mission II',
+    title:'Who Is Greatest?',
+    text:'On the road, the disciples have been arguing. Jesus asks you directly: "What were you arguing about?" You know. You all know. You were debating who among you is the greatest. He sits down, calls the twelve close, and places a child in the center. He looks at you.',
+    choices:[
+      {type:'righteous', label:'Confess the argument honestly and openly', effect:+24, desc:'"We argued about who was greatest." The admission costs you your pride — and earns you something worth far more.'},
+      {type:'neutral',   label:'Stay quiet and let someone else speak', effect:+6, desc:'Someone else admits it. The teaching lands, but at a distance.'},
+      {type:'sinful',    label:'Claim the argument was about something else', effect:-21, desc:'He already knew. Your deflection is its own kind of answer.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Jerusalem',
+    badge:'John\'s Mission III — Final',
+    title:'Behold Your Mother',
+    text:'You are the only disciple at the foot of the cross. Everyone else has fled. Jesus looks down through his suffering and sees his mother Mary, weeping. He looks at her — then at you. "Woman, behold your son." Then to you: "Behold your mother." He is giving her to you. This is his last act of care.',
+    choices:[
+      {type:'righteous', label:'Take her into your home from that hour', effect:+30, desc:'You take her arm. You lead her from the hill. From that day, she is your family. Love is the last act of the cross.'},
+      {type:'neutral',   label:'Nod but stand frozen by grief', effect:+6, desc:'You hear him. The full weight of it doesn\'t settle until later.'},
+      {type:'sinful',    label:'Look away — the grief is too much to bear', effect:-24, desc:'You turn from the cross. When you return, she is alone.'},
+    ],
+    isMission:true
+  },
+],
+james: [
+  {
+    location:'Galilee',
+    badge:'James\'s Mission I',
+    title:'A Seat at the Right Hand',
+    text:'Your mother Salome approaches Jesus with you and John at her side. She bows, and before you can stop her: "Grant that these two sons of mine may sit, one at your right and one at your left, in your kingdom." The other disciples overhear. Jesus turns to you: "You do not know what you are asking. Can you drink the cup I am going to drink?"',
+    choices:[
+      {type:'righteous', label:'"We can — but that is not ours to ask for."', effect:+25, desc:'You pull back from the request. Jesus nods. "You will drink my cup," he says quietly. "But the seats are not mine to give."'},
+      {type:'neutral',   label:'"We can," you say, without fully understanding', effect:+7, desc:'He receives it gently. You will not understand what cup means until much later.'},
+      {type:'sinful',    label:'Stand by the request without apology', effect:-20, desc:'The other ten hear you. The anger in the group lasts for days.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Capernaum',
+    badge:'James\'s Mission II',
+    title:'The Servant of All',
+    text:'Jesus kneels before each of the disciples with a basin of water. He is washing their feet, one by one. When he reaches you, you are sitting stiff with discomfort. The Son of God is kneeling at your feet. Every instinct says this is wrong — that you should be the one serving him.',
+    choices:[
+      {type:'righteous', label:'Let him wash your feet with full presence', effect:+24, desc:'Something in you breaks open. Ambition and pride soften like old bread. You finally understand what it means to lead.'},
+      {type:'neutral',   label:'Submit in silence, confused but compliant', effect:+6, desc:'You allow it. The meaning settles later, like a slow tide.'},
+      {type:'sinful',    label:'Pull back and protest: "This doesn\'t feel right."', effect:-21, desc:'"Unless I wash you, you have no part with me." You sit still — but for the wrong reasons.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Jerusalem',
+    badge:'James\'s Mission III — Final',
+    title:'The Garden Decision',
+    text:'In the Garden of Gethsemane, Jesus takes you, Peter, and John deeper in. "Stay here and keep watch with me," he says. He goes a little further, falls to the ground, and prays in anguish. When he returns — you are asleep. He wakes you: "Could you not watch with me one hour?" He goes again. You feel the weight of the night.',
+    choices:[
+      {type:'righteous', label:'Stay awake for the final watch', effect:+28, desc:'Your eyes sting. Your body aches. But you stay awake. When they come with torches and swords, you are the only one standing.'},
+      {type:'neutral',   label:'Try to stay awake but drift again', effect:+7, desc:'"The spirit is willing, but the flesh is weak." You are found sleeping again. It is honest, at least.'},
+      {type:'sinful',    label:'Sleep through all three watches', effect:-22, desc:'He wakes you a third time. His face shows no anger — only a grief too deep for accusation.'},
+    ],
+    isMission:true
+  },
+],
+mary: [
+  {
+    location:'Galilee',
+    badge:'Mary\'s Mission I',
+    title:'The Anointing',
+    text:'You stand in the doorway of Simon the Pharisee\'s house. You were not invited. You carry an alabaster jar of perfume. Jesus is reclining at the table. Simon is watching you with contempt. You cross the room and kneel. You begin to weep, and your tears fall on his feet. You wipe them with your hair, and pour out the perfume.',
+    choices:[
+      {type:'righteous', label:'Give everything — tears, perfume, presence', effect:+28, desc:'The room goes silent. Simon thinks: "If he were a prophet, he would know who is touching him." Then Jesus speaks: "Her many sins are forgiven, for she loved much."'},
+      {type:'neutral',   label:'Pour a small amount and withdraw quickly', effect:+7, desc:'The gesture is made. But the full surrender stays inside the jar.'},
+      {type:'sinful',    label:'Stop at the doorway — too many eyes', effect:-20, desc:'You return home with the jar unbroken. For years you wonder what would have happened.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Capernaum',
+    badge:'Mary\'s Mission II',
+    title:'Mary\'s Choice',
+    text:'Martha storms into the room where you are seated at Jesus\' feet, listening. Her voice is tight with exhaustion: "Lord, don\'t you care that my sister has left me to do all the work by myself? Tell her to help me!" Jesus turns to Martha — and then to you. He is about to speak to both of you.',
+    choices:[
+      {type:'righteous', label:'Stay seated — the teaching is what you need', effect:+24, desc:'"Mary has chosen what is better," he says, "and it will not be taken from her." You hear it with your whole body.'},
+      {type:'neutral',   label:'Rise to help Martha out of guilt', effect:+5, desc:'The meal is served. The teaching ends. You fed the body. You missed the word.'},
+      {type:'sinful',    label:'Argue back at Martha instead of listening', effect:-20, desc:'The peace of the room shatters. Jesus says nothing. But the moment is gone.'},
+    ],
+    isMission:true
+  },
+  {
+    location:'Jerusalem',
+    badge:'Mary\'s Mission III — Final',
+    title:'The First Witness',
+    text:'The stone has been rolled away. The tomb is empty. You are alone — the others ran back. You are weeping outside the tomb when a man you think is the gardener speaks to you: "Woman, why are you weeping? Whom are you seeking?" You have no idea who this is. Then he says one word.',
+    choices:[
+      {type:'righteous', label:'"Rabboni!" — you recognize him immediately', effect:+30, desc:'He says: "Do not cling to me — go and tell." You run. You are the first person on earth to carry the resurrection. The disciples don\'t believe you. You tell them anyway.'},
+      {type:'neutral',   label:'Ask him haltingly where the body has been taken', effect:+7, desc:'He speaks your name. You recognize him then. But the delay cost you a moment you\'ll always remember.'},
+      {type:'sinful',    label:'Turn away before he speaks your name', effect:-24, desc:'The gardener calls after you. You walk faster. The first witness of the resurrection almost walked away from it.'},
+    ],
+    isMission:true
+  },
+],
+};
 
 // ──────────────────────────────────────────
 // SACRIFICE TASKS (after redemption)
@@ -905,31 +1435,36 @@ function enterLocation(){
 // ──────────────────────────────────────────
 // EVENT FLOW
 // ──────────────────────────────────────────
+// EVENT FLOW
+// ──────────────────────────────────────────
 function nextEvent(){
   const loc = LOCATIONS[G.locationIdx];
   if(!G.missionsDone[G.locationIdx] && G.actsThisLocation >= loc.actsNeeded){
-    // Time for story mission
-    showMission(STORY_MISSIONS[G.locationIdx]);
+    const charId = G.character?.id || 'peter';
+    const missions = CHARACTER_MISSIONS[charId] || CHARACTER_MISSIONS.peter;
+    showMission(missions[G.locationIdx]);
   } else {
     showRandomAct();
   }
 }
 
 // ──────────────────────────────────────────
-// RANDOM ACT
+// RANDOM ACT (character-specific)
 // ──────────────────────────────────────────
 let usedActs = [];
+let _lastCharId = null;
 function showRandomAct(){
-  let available = RANDOM_ACTS.filter((_,i)=>!usedActs.includes(i));
-  if(available.length===0){ usedActs=[]; available=RANDOM_ACTS; }
+  const charId = G.character?.id || 'peter';
+  if(charId !== _lastCharId){ usedActs = []; _lastCharId = charId; }
+  const acts = CHARACTER_ACTS[charId] || CHARACTER_ACTS.peter;
+  let available = acts.filter((_,i)=>!usedActs.includes(i));
+  if(available.length===0){ usedActs=[]; available=acts; }
   const idx = Math.floor(Math.random()*available.length);
   const act = available[idx];
-  usedActs.push(RANDOM_ACTS.indexOf(act));
+  usedActs.push(acts.indexOf(act));
   showEvent(act, false);
 }
 
-// ──────────────────────────────────────────
-// STORY MISSION
 // ──────────────────────────────────────────
 function showMission(mission){
   showEvent(mission, true);
