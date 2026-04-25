@@ -19,10 +19,11 @@ button{cursor:pointer;font-family:inherit}
 }
 @keyframes kb{0%{transform:scale(1.0)translate(0,0)}50%{transform:scale(1.12)translate(-1.2%,-.5%)}100%{transform:scale(1.18)translate(1%,.5%)}   }
 
-/* mood overlays */
-#bg.great    {filter:saturate(1.12)brightness(1.05)}
-#bg.troubled {filter:saturate(0.28)brightness(0.88)}
-#bg.satan    {filter:saturate(0.8)brightness(0.7) hue-rotate(10deg)}
+/* mood overlays — applied as filters on the SVG scene backgrounds */
+#bg          {filter:saturate(1.0)brightness(1.0);transition:filter 2.5s ease}
+#bg.great    {filter:saturate(1.18)brightness(1.08)contrast(1.05)}
+#bg.troubled {filter:saturate(0.22)brightness(0.78)contrast(1.1)}
+#bg.satan    {filter:saturate(0.65)brightness(0.55)hue-rotate(12deg)contrast(1.2)}
 
 /* ─── LIGHT RAYS ─── */
 #rays{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
@@ -1334,13 +1335,7 @@ function updateMood(){
   currentMood = mood;
   const bg = document.getElementById('bg');
   const rays = document.getElementById('rays');
-  const BG_GRADIENTS = {
-    great:    'linear-gradient(180deg,#0a0601 0%,#1f1008 8%,#4a2510 25%,#8b4513 45%,#c48020 60%,#e8b840 72%,#f5d575 82%,#ffe898 90%,#fff5d0 100%)',
-    troubled: 'linear-gradient(180deg,#080b10 0%,#141820 15%,#1e2535 35%,#2a3445 55%,#3a4560 70%,#4a5570 80%,#60687a 90%,#72788a 100%)',
-    satan:    'linear-gradient(180deg,#060001 0%,#150304 10%,#240509 25%,#3a0810 45%,#550c18 60%,#6a0f1e 75%,#3a0810 88%,#060001 100%)',
-  };
-  bg.style.backgroundImage = '';
-  bg.style.background = BG_GRADIENTS[mood] || BG_GRADIENTS.great;
+  // CSS class only — preserve SVG background
   bg.className = mood;
   rays.className = mood;
   // Particles
@@ -1356,9 +1351,17 @@ function updateMood(){
   if(audioCtx) playMoodMusic(mood);
 }
 
-// ──────────────────────────────────────────
-// CHARACTER SELECT
-// ──────────────────────────────────────────
+function setLocationBg(locBg){
+  const bg = document.getElementById('bg');
+  const url = _SVG_URLS[locBg];
+  if(url){
+    bg.style.backgroundImage = `url("${url}")`;
+    bg.style.backgroundSize = 'cover';
+    bg.style.backgroundPosition = 'center';
+    bg.style.background = '';
+  }
+}
+
 function buildCharGrid(){
   const grid = document.getElementById('char-grid');
   grid.innerHTML = CHARACTERS.map(c=>`
@@ -1396,22 +1399,185 @@ function startGame(){
 }
 
 // ──────────────────────────────────────────
+// ANIMATED SVG SCENE BACKGROUNDS
+// ──────────────────────────────────────────
+const SVG_SCENES = {
+'galilee.png': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><defs>
+<linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1830"/><stop offset="40%" stop-color="#1a4a90"/><stop offset="72%" stop-color="#c86818"/><stop offset="100%" stop-color="#e8a050"/></linearGradient>
+<linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e5a90"/><stop offset="100%" stop-color="#061828"/></linearGradient>
+<radialGradient id="gSun" cx="50%" cy="67%"><stop offset="0%" stop-color="#fff8d0"/><stop offset="12%" stop-color="#ffd060" stop-opacity="0.9"/><stop offset="45%" stop-color="#ff8820" stop-opacity="0.35"/><stop offset="100%" stop-color="#ff4400" stop-opacity="0"/></radialGradient>
+<style>
+@keyframes cDrift{from{transform:translateX(0)}to{transform:translateX(90px)}}
+@keyframes cDrift2{from{transform:translateX(0)}to{transform:translateX(-70px)}}
+@keyframes wPulse{0%,100%{opacity:0.28}50%{opacity:0.65}}
+@keyframes bRock{0%,100%{transform:rotate(-1.8deg) translateY(0)}50%{transform:rotate(1.8deg) translateY(-4px)}}
+@keyframes bRock2{0%,100%{transform:rotate(1.2deg) translateY(-2px)}50%{transform:rotate(-1.5deg) translateY(2px)}}
+@keyframes shimmer{0%,100%{opacity:0.12}50%{opacity:0.38}}
+@keyframes glow{0%,100%{opacity:0.55}50%{opacity:0.75}}
+.c1{animation:cDrift 45s linear infinite}.c2{animation:cDrift2 60s linear infinite -22s}
+.c3{animation:cDrift 70s linear infinite -35s}.wv{animation:wPulse 3.5s ease-in-out infinite}
+.b1{animation:bRock 4.2s ease-in-out infinite;transform-origin:300px 450px}
+.b2{animation:bRock2 5.5s ease-in-out infinite;transform-origin:780px 440px}
+.sh{animation:shimmer 2.8s ease-in-out infinite}.gl{animation:glow 4s ease-in-out infinite}
+</style></defs>
+<rect width="1200" height="510" fill="url(#gSky)"/>
+<ellipse cx="600" cy="462" rx="340" ry="230" fill="url(#gSun)" class="gl"/>
+<circle cx="600" cy="458" r="26" fill="#fff9e8" opacity="0.96"/>
+<circle cx="600" cy="458" r="16" fill="#ffffff"/>
+<g class="c1"><ellipse cx="170" cy="138" rx="115" ry="29" fill="#b8ccdc" opacity="0.52"/><ellipse cx="245" cy="120" rx="85" ry="22" fill="#ccdde8" opacity="0.58"/></g>
+<g class="c2"><ellipse cx="870" cy="105" rx="145" ry="33" fill="#b0c4d4" opacity="0.48"/><ellipse cx="980" cy="90" rx="105" ry="26" fill="#c0d4e0" opacity="0.53"/></g>
+<g class="c3"><ellipse cx="440" cy="175" rx="90" ry="21" fill="#c4d8e4" opacity="0.38"/></g>
+<rect y="455" width="1200" height="220" fill="url(#gSea)"/>
+<ellipse cx="600" cy="550" rx="55" ry="190" fill="#ffc840" opacity="0.16" class="sh"/>
+<g class="wv" stroke="#60a8cc" stroke-width="1.8" fill="none">
+<path d="M0,482 Q150,474 300,482 Q450,490 600,482 Q750,474 900,482 Q1050,490 1200,482"/>
+<path d="M0,515 Q200,507 400,515 Q600,523 800,515 Q1000,507 1200,515"/>
+<path d="M0,550 Q180,542 360,550 Q540,558 720,550 Q900,542 1080,550 L1200,550"/>
+</g>
+<g class="sh" stroke="#c0e4ff" stroke-width="1" fill="none">
+<path d="M50,495 Q150,491 250,495 Q350,499 450,495"/>
+<path d="M520,528 Q640,524 760,528 Q880,532 960,528"/>
+<path d="M200,562 Q380,558 560,562 Q740,566 870,562"/>
+</g>
+<path d="M0,452 Q300,444 600,452 Q900,460 1200,452 L1200,476 Q900,468 600,476 Q300,484 0,476Z" fill="#7a6040"/>
+<rect y="474" width="1200" height="201" fill="#5a4020"/>
+<ellipse cx="180" cy="474" rx="90" ry="6" fill="#8a7050" opacity="0.45"/>
+<ellipse cx="820" cy="477" rx="110" ry="5" fill="#8a7050" opacity="0.38"/>
+<g class="b1"><g transform="translate(268,398)"><ellipse cx="0" cy="37" rx="48" ry="14" fill="#3a2010"/><rect x="-3" y="-58" width="6" height="95" fill="#4a3020"/><polygon points="3,-58 38,32 3,32" fill="#ece0ca" opacity="0.93"/><polygon points="3,-58 -30,26 3,26" fill="#dcd0b8" opacity="0.88"/></g></g>
+<g class="b2"><g transform="translate(748,395)"><ellipse cx="0" cy="33" rx="40" ry="12" fill="#2a1808"/><rect x="-2.5" y="-46" width="5" height="79" fill="#3a2818"/><polygon points="2.5,-46 32,28 2.5,28" fill="#f0e4d0" opacity="0.91"/><polygon points="2.5,-46 -25,22 2.5,22" fill="#e0d4c0" opacity="0.86"/></g></g>
+<g transform="translate(505,420)" opacity="0.72"><ellipse cx="0" cy="20" rx="26" ry="8" fill="#2a1808"/><rect x="-2" y="-33" width="4" height="53" fill="#3a2818"/><polygon points="2,-33 22,18 2,18" fill="#f0e4d0"/></g>
+<g fill="#3a5020"><rect x="75" y="450" width="3" height="32"/><rect x="87" y="445" width="3" height="37"/><rect x="99" y="452" width="2.5" height="29"/><ellipse cx="78" cy="447" rx="8" ry="5" fill="#4a6828"/><ellipse cx="90" cy="441" rx="8" ry="5" fill="#4a6828"/><rect x="1058" y="452" width="3" height="29"/><rect x="1072" y="447" width="3" height="34"/><ellipse cx="1061" cy="449" rx="8" ry="5" fill="#4a6828"/></g>
+</svg>`,
+
+'capernaum.png': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><defs>
+<linearGradient id="cSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a5090"/><stop offset="50%" stop-color="#6090d0"/><stop offset="100%" stop-color="#a0c4e8"/></linearGradient>
+<radialGradient id="cSun" cx="78%" cy="18%"><stop offset="0%" stop-color="#fff8b0"/><stop offset="18%" stop-color="#ffe060" stop-opacity="0.85"/><stop offset="55%" stop-color="#ffa020" stop-opacity="0.3"/><stop offset="100%" stop-color="#ff6000" stop-opacity="0"/></radialGradient>
+<linearGradient id="cGround" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8a868"/><stop offset="100%" stop-color="#907040"/></linearGradient>
+<style>
+@keyframes lensFlare{0%,100%{opacity:0.55}50%{opacity:0.85}}
+@keyframes awningWave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(0.96)}}
+@keyframes cDrift{from{transform:translateX(0)}to{transform:translateX(50px)}}
+.lf{animation:lensFlare 3s ease-in-out infinite}.aw{animation:awningWave 2.5s ease-in-out infinite}
+.aw2{animation:awningWave 3.1s ease-in-out infinite -1.2s}.cl{animation:cDrift 55s linear infinite}
+</style></defs>
+<rect width="1200" height="675" fill="url(#cSky)"/>
+<ellipse cx="940" cy="115" rx="360" ry="260" fill="url(#cSun)"/>
+<circle cx="940" cy="115" r="44" fill="#fff9c0" opacity="0.97"/>
+<circle cx="940" cy="115" r="28" fill="#ffffff"/>
+<line x1="940" y1="30" x2="940" y2="70" stroke="#fff8a0" stroke-width="3" opacity="0.7" class="lf"/>
+<line x1="940" y1="160" x2="940" y2="200" stroke="#fff8a0" stroke-width="3" opacity="0.7" class="lf"/>
+<g class="cl"><ellipse cx="200" cy="85" rx="100" ry="22" fill="#e8f0f8" opacity="0.45"/><ellipse cx="500" cy="65" rx="70" ry="18" fill="#dce8f4" opacity="0.35"/></g>
+<rect x="0" y="300" width="1200" height="375" fill="url(#cGround)"/>
+<rect x="0" y="295" width="160" height="250" fill="#b89858"/><rect x="0" y="295" width="155" height="250" fill="#c8a860"/>
+<rect x="140" y="295" width="160" height="250" fill="#b89050"/><rect x="145" y="295" width="155" height="250" fill="#c89858"/>
+<rect x="290" y="250" width="200" height="300" fill="#b89050"/><rect x="295" y="250" width="195" height="300" fill="#c8a060"/>
+<rect x="580" y="270" width="190" height="305" fill="#b88848"/><rect x="585" y="270" width="185" height="305" fill="#c89858"/>
+<rect x="760" y="280" width="170" height="295" fill="#b89050"/><rect x="765" y="280" width="165" height="295" fill="#c8a060"/>
+<rect x="920" y="255" width="280" height="320" fill="#b08040"/><rect x="925" y="255" width="275" height="320" fill="#c09050"/>
+<g><rect x="5" y="225" width="4" height="75" fill="#4a3010"/><rect x="145" y="225" width="4" height="74" fill="#4a3010"/></g>
+<g class="aw"><polygon points="0,228 155,228 145,260 10,260" fill="#d44030"/></g>
+<g><rect x="150" y="228" width="4" height="71" fill="#4a3010"/><rect x="294" y="228" width="4" height="70" fill="#4a3010"/></g>
+<g class="aw2"><polygon points="150,231 295,231 285,263 160,263" fill="#3060a8"/></g>
+<g><rect x="300" y="185" width="4" height="88" fill="#4a3010"/><rect x="484" y="185" width="4" height="88" fill="#4a3010"/></g>
+<polygon points="298,188 486,188 476,222 308,222" fill="#40a848"/>
+<g><rect x="492" y="195" width="4" height="79" fill="#4a3010"/><rect x="574" y="195" width="4" height="79" fill="#4a3010"/></g>
+<polygon points="490,198 576,198 568,228 498,228" fill="#c84820"/>
+<g><rect x="590" y="210" width="4" height="65" fill="#4a3010"/><rect x="744" y="210" width="4" height="65" fill="#4a3010"/></g>
+<polygon points="588,213 746,213 736,245 598,245" fill="#9030a0"/>
+<g><rect x="768" y="218" width="4" height="67" fill="#4a3010"/><rect x="924" y="218" width="4" height="67" fill="#4a3010"/></g>
+<polygon points="766,221 926,221 916,253 776,253" fill="#e89020"/>
+<g><rect x="930" y="195" width="4" height="88" fill="#4a3010"/><rect x="1195" y="195" width="4" height="88" fill="#4a3010"/></g>
+<polygon points="928,198 1197,198 1187,232 938,232" fill="#e03028"/>
+<rect x="8" y="260" width="133" height="55" fill="#f8f0d8" opacity="0.6"/>
+<rect x="158" y="263" width="130" height="52" fill="#f0e8d0" opacity="0.5"/>
+<rect x="308" y="222" width="162" height="45" fill="#e8f0e0" opacity="0.55"/>
+<rect x="500" y="228" width="66" height="40" fill="#f8e8d0" opacity="0.5"/>
+<rect x="598" y="245" width="140" height="42" fill="#f0e4f8" opacity="0.5"/>
+<rect x="778" y="253" width="138" height="40" fill="#fef4d8" opacity="0.55"/>
+<rect x="940" y="232" width="245" height="48" fill="#ffe8e0" opacity="0.5"/>
+<rect x="0" y="420" width="1200" height="255" fill="#a88848" opacity="0.7"/>
+<rect x="0" y="445" width="1200" height="230" fill="#907838"/>
+<g fill="#887030" opacity="0.6"><rect x="100" y="445" width="80" height="8" rx="4"/><rect x="320" y="450" width="60" height="6" rx="3"/><rect x="600" y="443" width="100" height="7" rx="3"/><rect x="900" y="448" width="70" height="6" rx="3"/></g>
+<ellipse cx="940" cy="220" rx="6" ry="80" fill="#fff8a0" opacity="0.22" class="lf"/>
+</svg>`,
+
+'jerusalem.png': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><defs>
+<linearGradient id="jSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2a50"/><stop offset="35%" stop-color="#4060a0"/><stop offset="70%" stop-color="#8090c0"/><stop offset="100%" stop-color="#b0b8d0"/></linearGradient>
+<radialGradient id="jLight" cx="50%" cy="80%"><stop offset="0%" stop-color="#ffffff" stop-opacity="1"/><stop offset="15%" stop-color="#fff8c0" stop-opacity="0.9"/><stop offset="40%" stop-color="#ffd060" stop-opacity="0.4"/><stop offset="80%" stop-color="#ffa020" stop-opacity="0.1"/><stop offset="100%" stop-color="#ff8000" stop-opacity="0"/></radialGradient>
+<radialGradient id="jGlow" cx="50%" cy="100%"><stop offset="0%" stop-color="#fff8d0" stop-opacity="0.8"/><stop offset="100%" stop-color="#ffd040" stop-opacity="0"/></radialGradient>
+<style>
+@keyframes holyLight{0%,100%{opacity:0.7}50%{opacity:1}}
+@keyframes rayPulse{0%,100%{opacity:0.15;transform:scaleY(1)}50%{opacity:0.32;transform:scaleY(1.04)}}
+@keyframes cDrift{from{transform:translateX(0)}to{transform:translateX(60px)}}
+@keyframes starTwinkle{0%,100%{opacity:0.6}50%{opacity:1}}
+.hl{animation:holyLight 4s ease-in-out infinite}
+.ray{animation:rayPulse 5s ease-in-out infinite}.cl{animation:cDrift 70s linear infinite}
+.st{animation:starTwinkle 3s ease-in-out infinite}.st2{animation:starTwinkle 4.5s ease-in-out infinite -2s}
+</style></defs>
+<rect width="1200" height="675" fill="url(#jSky)"/>
+<circle cx="90" cy="60" r="3" fill="#fff" class="st" opacity="0.7"/>
+<circle cx="220" cy="40" r="2" fill="#fff" class="st2" opacity="0.6"/>
+<circle cx="380" cy="25" r="2.5" fill="#fff" class="st" opacity="0.65"/>
+<circle cx="950" cy="35" r="2" fill="#fff" class="st2" opacity="0.6"/>
+<circle cx="1100" cy="55" r="3" fill="#fff" class="st" opacity="0.7"/>
+<g class="cl"><ellipse cx="150" cy="120" rx="120" ry="26" fill="#c0ccd8" opacity="0.4"/><ellipse cx="1000" cy="100" rx="160" ry="28" fill="#b8c8d4" opacity="0.35"/></g>
+<rect x="120" y="320" width="960" height="280" fill="#d4b878"/>
+<rect x="120" y="320" width="955" height="275" fill="#e0c888"/>
+<rect x="200" y="210" width="800" height="280" fill="#d8bc78"/>
+<rect x="205" y="215" width="795" height="270" fill="#e8cc88"/>
+<rect x="300" y="130" width="600" height="260" fill="#dcc07a"/>
+<rect x="305" y="135" width="595" height="252" fill="#ecca88"/>
+<rect x="300" y="135" width="595" height="252" fill="#ecca88"/>
+<rect x="420" y="78" width="360" height="200" fill="#e0c47a"/>
+<rect x="425" y="83" width="355" height="192" fill="#f0d488"/>
+<rect x="460" y="52" width="70" height="170" fill="#e8cc80"/>
+<rect x="670" y="52" width="70" height="170" fill="#e8cc80"/>
+<rect x="540" y="30" width="120" height="145" fill="#dcc878"/>
+<rect x="545" y="35" width="115" height="138" fill="#ecd888"/>
+<g fill="#c8a860" opacity="0.7"><rect x="205" y="350" width="18" height="140"/><rect x="242" y="350" width="18" height="140"/><rect x="940" y="350" width="18" height="140"/><rect x="977" y="350" width="18" height="140"/><rect x="305" y="268" width="16" height="122"/><rect x="338" y="268" width="16" height="122"/><rect x="846" y="268" width="16" height="122"/><rect x="879" y="268" width="16" height="122"/></g>
+<rect x="480" y="280" width="240" height="185" fill="#c0a060"/>
+<rect x="485" y="285" width="230" height="177" fill="#d0b070"/>
+<ellipse cx="600" cy="465" rx="280" ry="340" fill="url(#jLight)" class="hl"/>
+<ellipse cx="600" cy="680" rx="180" ry="200" fill="url(#jGlow)" class="hl"/>
+<g class="ray" fill="#fff8c0" opacity="0.2" transform-origin="600 465">
+<polygon points="600,280 590,680 610,680"/>
+<polygon points="600,300 565,680 595,680" opacity="0.7"/>
+<polygon points="600,300 605,680 635,680" opacity="0.7"/>
+</g>
+<g fill="#1a3010" opacity="0.85">
+<rect x="110" y="430" width="8" height="120"/><rect x="108" y="405" width="12" height="40" rx="6"/>
+<rect x="130" y="445" width="6" height="105"/><rect x="128" y="425" width="10" height="32" rx="5"/>
+<rect x="1058" y="435" width="8" height="115"/><rect x="1056" y="410" width="12" height="38" rx="6"/>
+<rect x="1080" y="448" width="6" height="102"/><rect x="1078" y="428" width="10" height="30" rx="5"/>
+</g>
+<rect x="0" y="560" width="1200" height="115" fill="#b09050"/>
+<g fill="#a08040" opacity="0.6"><rect x="150" y="562" width="100" height="10" rx="5"/><rect x="400" y="565" width="80" height="8" rx="4"/><rect x="700" y="560" width="120" height="10" rx="5"/><rect x="950" y="563" width="90" height="9" rx="4"/></g>
+<rect x="525" y="465" width="150" height="95" fill="#a88040"/>
+</svg>`,
+};
+// Create blob URLs for SVG scenes once
+const _SVG_URLS = {};
+Object.entries(SVG_SCENES).forEach(([k,v])=>{
+  _SVG_URLS[k] = URL.createObjectURL(new Blob([v],{type:'image/svg+xml'}));
+});
+
+// ──────────────────────────────────────────
 // MAP
 // ──────────────────────────────────────────
 function showMap(){
   const loc = LOCATIONS[G.locationIdx];
-  // Set background to location image
-  const LOC_GRADIENTS = {
-    'galilee.png':    'linear-gradient(180deg,#091830 0%,#132a50 20%,#1a4070 45%,#2a6090 62%,#3a7aa0 72%,#4a6858 80%,#3d5a40 90%,#2e4530 100%)',
-    'capernaum.png':  'linear-gradient(180deg,#0c0a06 0%,#201810 15%,#3a2c18 30%,#5a4025 50%,#7a5a30 65%,#9a7a45 78%,#b89060 88%,#c8a070 100%)',
-    'jerusalem.png':  'linear-gradient(180deg,#060408 0%,#150e0a 12%,#2a1a0c 28%,#4a2f12 45%,#7a5020 62%,#a87838 76%,#c8a050 85%,#e8c860 95%,#f8e090 100%)',
-  };
   const bg_el = document.getElementById('bg');
-  bg_el.style.backgroundImage = '';
-  bg_el.style.background = LOC_GRADIENTS[loc.bg] || LOC_GRADIENTS['galilee.png'];
+  const url = _SVG_URLS[loc.bg];
+  if(url){
+    bg_el.style.backgroundImage = `url("${url}")`;
+    bg_el.style.backgroundSize = 'cover';
+    bg_el.style.backgroundPosition = 'center';
+    bg_el.style.background = '';
+  } else {
+    bg_el.style.background = '#1a1a2e';
+  }
   document.getElementById('location-label').textContent = loc.name;
 
-  // Build journey nodes
   const jp = document.getElementById('journey-path');
   jp.innerHTML = LOCATIONS.map((l,i)=>{
     const state = i<G.locationIdx?'done':i===G.locationIdx?'current':'locked';
@@ -1426,8 +1592,8 @@ function showMap(){
   document.getElementById('map-btn').textContent = `Enter ${loc.name} →`;
   showScreen('map-screen');
 }
-
 function enterLocation(){
+  setLocationBg(LOCATIONS[G.locationIdx].bg);
   flashScreen('#fff', 600);
   setTimeout(()=>nextEvent(), 300);
 }
@@ -1698,11 +1864,8 @@ function loadGame(){
 // INIT
 // ──────────────────────────────────────────
 buildCharGrid();
-// Set initial background gradient
-(function(){
-  const b = document.getElementById('bg');
-  b.style.background = 'linear-gradient(180deg,#0a0601 0%,#1f1008 8%,#4a2510 25%,#8b4513 45%,#c48020 60%,#e8b840 72%,#f5d575 82%,#ffe898 90%,#fff5d0 100%)';
-})();
+setLocationBg('galilee.png');
+
 window.addEventListener('resize',()=>{ cv.width=window.innerWidth; cv.height=window.innerHeight; });
 // Enable audio on first click
 document.addEventListener('click',()=>{ if(!audioInitialized) initAudio(); },{once:true});
