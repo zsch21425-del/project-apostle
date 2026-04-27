@@ -1,0 +1,16 @@
+# GameMaker Studio 2 build/cache artifacts
+cache/
+output/
+*.yydebug
+*.cache
+.cache/
+tmp/
+build_log.txt
+build_log.html
+
+# IDE & OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
