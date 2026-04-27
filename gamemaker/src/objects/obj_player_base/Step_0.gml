@@ -1,17 +1,24 @@
 // =============================================================
 // obj_player_base — Step
-// Reads input, ticks the state machine, spawns hitboxes via the
-// data-driven move table, and applies physics with a floor clamp.
+// Reads input for this player_index, ticks the state machine,
+// dispatches the data-driven move table (multi-hit, projectile,
+// dash, screen-flash, launcher), applies physics + floor clamp.
 // =============================================================
 
+// Pause check
+if (instance_exists(obj_pause_menu) && obj_pause_menu.paused) exit;
+
+// Hit-stop freeze
+if (instance_exists(obj_controller) && obj_controller.hitstop > 0) exit;
+
 // --- Input -------------------------------------------------------
-var key_left    = keyboard_check(vk_left)             || gamepad_button_check(0, gp_padl);
-var key_right   = keyboard_check(vk_right)            || gamepad_button_check(0, gp_padr);
-var key_jump    = keyboard_check_pressed(vk_space)    || gamepad_button_check_pressed(0, gp_face1);
-var key_attack  = keyboard_check_pressed(ord("X"))    || gamepad_button_check_pressed(0, gp_face3);
-var key_grab    = keyboard_check_pressed(ord("Z"))    || gamepad_button_check_pressed(0, gp_face2);
-var key_special = keyboard_check_pressed(ord("V"))    || gamepad_button_check_pressed(0, gp_face4);
-var key_summon  = keyboard_check_pressed(ord("C"))    || gamepad_button_check_pressed(0, gp_shoulderr);
+var key_left    = input_left(player_index);
+var key_right   = input_right(player_index);
+var key_jump    = input_jump(player_index);
+var key_attack  = input_attack(player_index);
+var key_grab    = input_grab(player_index);
+var key_special = input_special(player_index);
+var key_summon  = input_summon(player_index);
 
 // Lock out input while kneeling
 if (state == PSTATE_KNEEL) {
@@ -49,7 +56,7 @@ if (key_attack) {
     }
 }
 
-// Advance the combo chain when buffered input + window are open
+// Advance combo chain when current move ends and input was buffered
 if (state == PSTATE_ATTACK && move_timer <= 0 && combo_input_buffer) {
     combo_index++;
     if (combo_index >= array_length(combo_chain)) combo_index = 0;
@@ -106,6 +113,14 @@ if (key_special && special_meter >= special_meter_max && special_move != noone) 
     _start_move(special_move);
     state = PSTATE_SPECIAL;
     special_meter = 0;
+
+    // Screen-flash specials trigger a controller flash
+    if (variable_struct_exists(special_move, "screen_flash") && special_move.screen_flash) {
+        if (instance_exists(obj_controller)) {
+            obj_controller.flash_alpha = 1.0;
+            obj_controller.flash_color = c_white;
+        }
+    }
 }
 
 // --- Summon Jesus ------------------------------------------------
@@ -118,17 +133,51 @@ if (key_summon && summon_charges > 0 && summon_cooldown <= 0) {
         if (state == ESTATE_PRAY) {
             other.converted_count++;
             sanctification_restore(other, 20);
+            on_pre_destroy();
             instance_destroy();
         }
     }
     sanctification_restore(self, 25);
+    instance_create_layer(x, y - 60, "Instances", obj_jesus_mentor);
     state = PSTATE_IDLE;
 }
 
-// --- Move timer (resolves attack frames) -------------------------
+// --- Move dispatch (per-frame work for the active move) ---------
 if (state == PSTATE_ATTACK || state == PSTATE_AIR_ATK || state == PSTATE_SPECIAL) {
     move_timer--;
+    move_active_frames++;
     if (combo_window > 0) combo_window--;
+
+    var _is_active = (move_timer > current_move.recovery);
+
+    // Dash specials drag the player forward during active frames
+    if (_is_active && variable_struct_exists(current_move, "dash_speed")) {
+        hsp = facing * current_move.dash_speed;
+    }
+
+    // Multi-hit moves spawn extra hit pulses on the interval
+    if (_is_active && variable_struct_exists(current_move, "multi_hit") && current_move.multi_hit) {
+        if (multi_hit_cd <= 0) {
+            spawn_player_hit_pulse(self, current_move);
+            multi_hit_cd = current_move.multi_hit_interval;
+        } else {
+            multi_hit_cd--;
+        }
+    }
+
+    // Projectile-storm specials spawn coins on a stagger interval
+    if (_is_active
+        && variable_struct_exists(current_move, "spawns_projectile")
+        && current_move.spawns_projectile
+        && variable_struct_exists(current_move, "projectile_interval")) {
+        if (projectile_cd <= 0) {
+            spawn_coin_fan(self, current_move, 1);
+            projectile_cd = current_move.projectile_interval;
+        } else {
+            projectile_cd--;
+        }
+    }
+
     if (move_timer <= 0 && !combo_input_buffer) {
         state = on_ground ? PSTATE_IDLE : PSTATE_JUMP;
         combo_index = 0;
@@ -136,7 +185,7 @@ if (state == PSTATE_ATTACK || state == PSTATE_AIR_ATK || state == PSTATE_SPECIAL
 }
 
 // --- Decay timers ------------------------------------------------
-if (invuln_timer > 0)   invuln_timer--;
+if (invuln_timer > 0)    invuln_timer--;
 if (summon_cooldown > 0) summon_cooldown--;
 
 // --- Physics + floor clamp --------------------------------------
@@ -159,7 +208,10 @@ if (_prayer != noone && _prayer.state == ESTATE_PRAY) {
     converted_count++;
     sanctification_restore(self, 15);
     passive_on_convert(self, _prayer);
-    with (_prayer) instance_destroy();
+    with (_prayer) {
+        on_pre_destroy();
+        instance_destroy();
+    }
 }
 
 // --- Defeat -----------------------------------------------------
@@ -168,15 +220,32 @@ if (hp <= 0 && state != PSTATE_KNEEL) {
     hsp = 0;
 }
 
-// --- Per-step passive hook --------------------------------------
 passive_per_step(self);
 
 // =============================================================
-// Local helper — begin executing a move definition
+// Local helper — begin executing a move definition.
+// Spawns the appropriate hitbox / projectile fan based on flags.
 // =============================================================
 function _start_move(_move) {
     current_move = _move;
     move_timer = _move.frames;
     combo_window = _move.combo_window;
-    spawn_player_hitbox(self, _move);
+    move_active_frames = 0;
+    multi_hit_cd = 0;
+    projectile_cd = 0;
+
+    // Projectile burst (no continuous storm) — fire fan immediately
+    if (variable_struct_exists(_move, "spawns_projectile") && _move.spawns_projectile
+        && !variable_struct_exists(_move, "projectile_interval")) {
+        var _count = variable_struct_exists(_move, "projectile_count") ? _move.projectile_count : 1;
+        spawn_coin_fan(self, _move, _count);
+    }
+    // Multi-hit moves spawn their first pulse immediately
+    else if (variable_struct_exists(_move, "multi_hit") && _move.multi_hit) {
+        spawn_player_hit_pulse(self, _move);
+    }
+    // Standard melee move
+    else if (_move.hitbox_w > 0 && _move.hitbox_h > 0) {
+        spawn_player_hitbox(self, _move);
+    }
 }

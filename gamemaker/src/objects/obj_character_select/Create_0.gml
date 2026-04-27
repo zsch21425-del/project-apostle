@@ -1,18 +1,24 @@
 // =============================================================
 // obj_character_select — Create
-// 4 disciples in a row. Peter is enabled in MVP; the others are
-// flagged enabled=false but still selectable for testing —
-// they spawn with their stub moveset (single basic jab).
+// Up to 4 players claim a disciple. P1 is keyboard-or-pad-0,
+// P2..P4 are pad slots 1..3. A claimed slot shows the player tag.
+// Pressing Start (P1) begins the game with all claimed players.
 // =============================================================
 
 slots = [
-    { name: "PETER",   color: make_color_rgb(160,  80,  60), obj: obj_player_peter,   enabled: true,
-      blurb: "The Rock — heavy, slow, hits like a hammer." },
-    { name: "JOHN",    color: make_color_rgb(200, 200, 220), obj: obj_player_john,    enabled: false,
-      blurb: "The Beloved — balanced staff fighter. (stub)" },
-    { name: "JAMES",   color: make_color_rgb(110, 140, 200), obj: obj_player_james,   enabled: false,
-      blurb: "Son of Thunder — five-hit lightning flurry. (stub)" },
-    { name: "MATTHEW", color: make_color_rgb(180, 150,  70), obj: obj_player_matthew, enabled: false,
-      blurb: "Tax Collector — mixed melee and coin throws. (stub)" }
+    { name: "PETER",   color: make_color_rgb(160,  80,  60), obj: obj_player_peter,   blurb: "The Rock — heavy combo, dash special, teammate-protect." },
+    { name: "JOHN",    color: make_color_rgb(200, 200, 220), obj: obj_player_john,    blurb: "The Beloved — staff combo, screen-stun, conversion bonus." },
+    { name: "JAMES",   color: make_color_rgb(110, 140, 200), obj: obj_player_james,   blurb: "Son of Thunder — 5-hit flurry, AoE spinner." },
+    { name: "MATTHEW", color: make_color_rgb(180, 150,  70), obj: obj_player_matthew, blurb: "Tax Collector — coin throws, blessing-coin drops." }
 ];
-cursor = 0;
+
+// Per-player cursor and claim
+cursor    = [0, 0, 0, 0];
+claimed   = [false, false, false, false];
+ready     = [false, false, false, false];
+
+// P1 is always claimed by default (keyboard)
+claimed[0] = true;
+
+// Keep selected_player_obj in global for the spawn fallback
+global.selected_player_obj = slots[cursor[0]].obj;

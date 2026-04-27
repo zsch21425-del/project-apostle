@@ -1,0 +1,10 @@
+var _bob = (on_ground) ? sin(degtorad(bob_phase)) * 3 : 0;
+draw_set_color(make_color_rgb(255, 215, 80));
+draw_circle(x, y - 8 + _bob, 7, false);
+draw_set_color(make_color_rgb(180, 140, 30));
+draw_circle(x, y - 8 + _bob, 7, true);
+draw_set_color(make_color_rgb(255, 255, 200));
+draw_set_halign(fa_center);
+draw_text(x, y - 14 + _bob, "+");
+draw_set_halign(fa_left);
+draw_set_color(c_white);

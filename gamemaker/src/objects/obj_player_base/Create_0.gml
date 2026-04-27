@@ -1,8 +1,11 @@
 // =============================================================
 // obj_player_base — Create
 // Parent of every disciple. Children call event_inherited() then
-// override stats and movesets via apply_moveset() in scr_movesets.
+// override stats and movesets via the moveset_*() functions.
 // =============================================================
+
+// Per-instance player slot (0..3). Children may override.
+player_index = 0;
 
 // Stats (children overwrite)
 hp_max = 100;
@@ -30,6 +33,9 @@ combo_window = 0;
 combo_input_buffer = false;
 current_move = noone;
 move_timer = 0;
+move_active_frames = 0;        // counts up while a move is in its hit-active window
+multi_hit_cd = 0;              // ticks down each frame for multi-hit pulses
+projectile_cd = 0;             // for storm-style staggered fans
 
 // Air attack
 air_attack = noone;
@@ -46,7 +52,7 @@ special_move = noone;
 special_meter = 0;
 special_meter_max = 100;
 
-// Passive hooks (children may override)
+// Passive hooks (children may override all four)
 passive_on_convert      = function(_self, _enemy) { };
 passive_on_combo_hit    = function(_self, _hit_number) { };
 passive_on_take_damage  = function(_self, _amount) { };
@@ -60,3 +66,8 @@ summon_cooldown = 0;
 converted_count = 0;
 defeated_count = 0;
 combo_high = 0;
+
+// Visual placeholders (children override these in their Create)
+char_name  = "Disciple";
+body_color = c_white;
+weapon_kind = "none";          // "net", "staff", "twin_staff", "ledger"

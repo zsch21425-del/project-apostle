@@ -1,43 +1,45 @@
 // =============================================================
 // obj_controller — Draw GUI
-// HUD: sanctification halo meter, combo counter, summon icon.
+// Per-player HUD slots + screen flash overlay.
 // =============================================================
 
-var _p = instance_nearest(0, 0, obj_player_base);
-if (_p == noone) exit;
+// Draw a HUD card per active player (P1 top-left, P2 next, etc.)
+var _slot = 0;
+with (obj_player_base) {
+    var _ox = 20 + _slot * 200;
+    var _oy = 20;
+    draw_sanctification_meter(_ox, _oy, hp, hp_max);
 
-draw_sanctification_meter(20, 20, _p.hp, _p.hp_max);
-
-// Character name + combo
-draw_set_color(c_white);
-draw_text(20, 80, _p.char_name);
-
-if (_p.combo_high > 1) {
-    draw_set_halign(fa_right);
-    draw_set_color(c_yellow);
-    draw_text_transformed(
-        display_get_gui_width() - 20, 30,
-        string(_p.combo_high) + "-HIT COMBO",
-        2, 2, 0
-    );
-    draw_set_halign(fa_left);
     draw_set_color(c_white);
+    draw_text(_ox, _oy + 64, "P" + string(player_index + 1) + " — " + char_name);
+
+    // Special meter
+    var _sm_pct = special_meter / special_meter_max;
+    draw_set_color(make_color_rgb(40, 40, 40));
+    draw_rectangle(_ox, _oy + 78, _ox + 96, _oy + 88, false);
+    draw_set_color(make_color_rgb(255, 215, 80));
+    draw_rectangle(_ox, _oy + 78, _ox + 96 * _sm_pct, _oy + 88, false);
+
+    draw_set_color(c_white);
+    if (summon_charges > 0) {
+        draw_text(_ox, _oy + 92, "C — Summon Jesus");
+    }
+
+    // Combo counter (only the top combo so HUD stays uncluttered)
+    if (combo_high > 1) {
+        draw_set_color(c_yellow);
+        draw_text(_ox, _oy + 108, string(combo_high) + "-HIT");
+        draw_set_color(c_white);
+    }
+
+    _slot++;
 }
 
-// Special meter (small bar under the halo)
-var _sm_pct = _p.special_meter / _p.special_meter_max;
-draw_set_color(make_color_rgb(40, 40, 40));
-draw_rectangle(20, 90, 20 + 96, 102, false);
-draw_set_color(make_color_rgb(255, 215, 80));
-draw_rectangle(20, 90, 20 + 96 * _sm_pct, 102, false);
-draw_set_color(c_white);
-draw_text(120, 88, "SPECIAL");
-
-// Summon Jesus icon
-if (_p.summon_charges > 0) {
-    draw_set_color(make_color_rgb(255, 240, 200));
-    draw_circle(40, 130, 14, false);
-    draw_set_color(c_black);
-    draw_text(56, 124, "Press C — Summon Jesus");
+// Screen flash overlay
+if (flash_alpha > 0) {
+    draw_set_color(flash_color);
+    draw_set_alpha(flash_alpha);
+    draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
+    draw_set_alpha(1);
     draw_set_color(c_white);
 }

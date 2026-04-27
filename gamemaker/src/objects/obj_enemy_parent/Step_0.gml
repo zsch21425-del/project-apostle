@@ -1,53 +1,63 @@
 // =============================================================
 // obj_enemy_parent — Step
-// AI states + hidden HP + prayer transition. Animation-cue flags
-// (is_winded / is_staggering) are read by the Draw event so the
-// player can read enemy condition without a meter.
+// AI states + hidden HP + prayer transition. Children override
+// `ai_step_override` to inject custom behaviour.
 // =============================================================
+
+if (instance_exists(obj_pause_menu) && obj_pause_menu.paused) exit;
+if (instance_exists(obj_controller) && obj_controller.hitstop > 0) exit;
+
+// Per-step ambient hook (Pharisee buff aura, etc.)
+ambient_per_step();
 
 var _target = instance_nearest(x, y, obj_player_base);
 
-// --- PATROL ------------------------------------------------------
-if (state == ESTATE_PATROL) {
-    hsp = patrol_dir * (move_speed * 0.5);
-    facing = patrol_dir;
+// Custom AI override — return true to skip default state machine
+var _override_ran = ai_step_override();
 
-    patrol_timer--;
-    if (patrol_timer <= 0) {
-        patrol_dir *= -1;
-        patrol_timer = 60 + irandom(60);
-    }
+if (!_override_ran) {
+    // --- PATROL --------------------------------------------------
+    if (state == ESTATE_PATROL) {
+        hsp = patrol_dir * (move_speed * 0.5);
+        facing = patrol_dir;
 
-    if (_target != noone && point_distance(x, y, _target.x, _target.y) < sight_range) {
-        state = ESTATE_CHASE;
-    }
-}
-
-// --- CHASE -------------------------------------------------------
-if (state == ESTATE_CHASE && _target != noone) {
-    if (_target.x < x) { hsp = -move_speed; facing = -1; }
-    else                { hsp =  move_speed; facing =  1; }
-
-    if (is_winded) hsp *= 0.7;
-
-    if (point_distance(x, y, _target.x, _target.y) < attack_range && attack_cooldown <= 0) {
-        state = ESTATE_ATTACK;
-        attack_telegraph = 20;
-        hsp = 0;
-    }
-}
-
-// --- ATTACK ------------------------------------------------------
-if (state == ESTATE_ATTACK) {
-    hsp = 0;
-    if (attack_telegraph > 0) {
-        attack_telegraph--;
-        if (attack_telegraph == 10) {
-            spawn_enemy_hitbox(self, 36, -16, 36, 28, damage);
+        patrol_timer--;
+        if (patrol_timer <= 0) {
+            patrol_dir *= -1;
+            patrol_timer = 60 + irandom(60);
         }
-        if (attack_telegraph == 0) {
-            attack_cooldown = 60;
+
+        if (_target != noone && point_distance(x, y, _target.x, _target.y) < sight_range) {
             state = ESTATE_CHASE;
+        }
+    }
+
+    // --- CHASE ---------------------------------------------------
+    if (state == ESTATE_CHASE && _target != noone) {
+        if (_target.x < x) { hsp = -move_speed; facing = -1; }
+        else                { hsp =  move_speed; facing =  1; }
+
+        if (is_winded) hsp *= 0.7;
+
+        if (point_distance(x, y, _target.x, _target.y) < attack_range && attack_cooldown <= 0) {
+            state = ESTATE_ATTACK;
+            attack_telegraph = 20;
+            hsp = 0;
+        }
+    }
+
+    // --- ATTACK --------------------------------------------------
+    if (state == ESTATE_ATTACK) {
+        hsp = 0;
+        if (attack_telegraph > 0) {
+            attack_telegraph--;
+            if (attack_telegraph == 10) {
+                spawn_enemy_hitbox(self, 36, -16, 36, 28, damage * damage_buff);
+            }
+            if (attack_telegraph == 0) {
+                attack_cooldown = 60;
+                state = ESTATE_CHASE;
+            }
         }
     }
 }
@@ -94,7 +104,7 @@ if (state == ESTATE_THROWN) {
     }
 }
 
-// --- Animation cue flags (the "hidden HP bar") -------------------
+// --- Animation cue flags -----------------------------------------
 var _hp_pct = (hp_max > 0) ? (hp / hp_max) : 0;
 is_winded     = (_hp_pct < threshold_winded && _hp_pct >= threshold_stagger);
 is_staggering = (_hp_pct < threshold_stagger && _hp_pct > 0);
@@ -109,3 +119,4 @@ apply_floor_clamp(self);
 // --- Decay -------------------------------------------------------
 if (hit_flash > 0)        hit_flash -= 0.1;
 if (attack_cooldown > 0)  attack_cooldown--;
+if (block_cooldown > 0)   block_cooldown--;
